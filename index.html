@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>HCOM Tour</title>
+  <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
+  <style>
+    #play-button {
+      position: absolute;
+      top: calc(50% - 25px);
+      left: calc(50% - 50px - 50px);
+      width: 180px;
+      height: 70px;
+      z-index: 10;
+      background-color: #006a4b;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      font-size: 18px;
+      cursor: pointer;
+    }
+    .hidden {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <button id="play-button">Start Experience</button>
+  <a-scene id="scene" loading-screen="enabled:false">
+    <a-assets>
+      <video id="intro-video" src="/videos/intro.mp4" crossorigin="anonymous" playsinline muted preload="auto"></video>
+      <video id="scene-two-video" src="/videos/OMM.mp4" crossorigin="anonymous" playsinline muted preload="auto"></video>
+      <video id="scene-three-video" src="/videos/Anatomy.mp4" crossorigin="anonymous" playsinline muted preload="auto"></video>
+      <video id="scene-four-video" src="/videos/CTAC.mp4" crossorigin="anonymous" playsinline muted preload="auto"></video>
+      <video id="scene-five-video" src="/videos/Student.mp4" crossorigin="anonymous" playsinline muted preload="auto"></video>
+      <video id="scene-six-video" src="" crossorigin="anonymous" playsinline muted preload="auto"></video>
+      <video id="scene-seven-video" src="/videos/Classrooms.mp4" crossorigin="anonymous" playsinline muted preload="auto"></video>
+      <video id="scene-eight-video" src="/videos/Fitness.mp4" crossorigin="anonymous" playsinline muted preload="auto"></video>
+      <video id="scene-nine-video" src="/videos/Admission.mp4" crossorigin="anonymous" playsinline muted preload="auto"></video>
+      <img id="ommlab-normal" src="http://m2qall8jajdg-hls-push.5centscdn.com/btn/OMM.png" crossorigin="anonymous" />
+      <img id="admin-normal" src="http://m2qall8jajdg-hls-push.5centscdn.com/btn/Admission.png" crossorigin="anonymous" />
+      <img id="anatomy-normal" src="http://m2qall8jajdg-hls-push.5centscdn.com/btn/Anatomy.png" crossorigin="anonymous" />
+      <img id="cafe-normal" src="http://m2qall8jajdg-hls-push.5centscdn.com/btn/student.png" crossorigin="anonymous" />
+      <img id="clinical-normal" src="http://m2qall8jajdg-hls-push.5centscdn.com/btn/Clinical.png" crossorigin="anonymous" />
+      <img id="fitness-normal" src="http://m2qall8jajdg-hls-push.5centscdn.com/btn/Fitness.png" crossorigin="anonymous" />
+      <img id="study-normal" src="http://m2qall8jajdg-hls-push.5centscdn.com/btn/Classroom.png" crossorigin="anonymous" />
+      <img id="translation-normal" src="http://m2qall8jajdg-hls-push.5centscdn.com/btn/Translational.png" crossorigin="anonymous" />
+      <img id="homebtn" src="http://m2qall8jajdg-hls-push.5centscdn.com/btn/Home.png" crossorigin="anonymous" />
+      <img id="optionsbtn" src="http://m2qall8jajdg-hls-push.5centscdn.com/btn/showoptionsbtn.png" crossorigin="anonymous" />
+    </a-assets>
+    <a-videosphere id="video-sky" src="#intro-video" rotation="0 260 0" ></a-videosphere>
+    <a-camera>
+      <a-cursor raycaster="objects: .clickable" color="yellow"></a-cursor>
+    </a-camera>
+    <!-- Left Column Buttons -->
+    <a-entity id="menubtn" position="0.7 0 0" class="hidden" visible="false">
+      <!-- Left Column Buttons -->
+      <a-image src="#ommlab-normal" width="1.5" height="0.39" position="-1.5 1.25 -5" class="clickable" id="ommlab"></a-image>
+      <a-image src="#anatomy-normal" width="1.5" height="0.39" position="-1.5 0.75 -5" class="clickable" id="anatomy"></a-image>
+      <a-image src="#clinical-normal" width="1.5" height="0.39" position="-1.5 0.25 -5" class="clickable" id="clinical"></a-image>
+      <a-image src="#translation-normal" width="1.5" height="0.39" position="-1.5 -0.25 -5" class="clickable" id="translation"></a-image>
+    
+      <!-- Right Column Buttons -->
+      <a-image src="#cafe-normal" width="1.5" height="0.39" position="1.5 1.25 -5" class="clickable" id="cafe"></a-image>
+      <a-image src="#study-normal" width="1.5" height="0.39" position="1.5 0.75 -5" class="clickable" id="study"></a-image>
+      <a-image src="#fitness-normal" width="1.5" height="0.39" position="1.5 0.25 -5" class="clickable" id="fitness"></a-image>
+      <a-image src="#admin-normal" width="1.5" height="0.39" position="1.5 -0.25 -5" class="clickable" id="admin"></a-image>
+    </a-entity>
+    
+
+    <a-entity id="home" position="0 -1 -5" class="hidden" visible="false">
+      <a-image src="#homebtn" width="1.5" height="0.39" position="-0.234 0 0.01" class="clickable" id="homebtn"></a-image>
+    </a-entity>
+    <a-entity id="options" position="2 -1 -5" class="hidden" visible="false">
+      <a-image src="#optionsbtn" width="1.5" height="0.39" position="-0.454 0 0.01" class="clickable" id="optionbtn"></a-image>
+    </a-entity>
+  </a-scene>
+
+  <script>
+     // Grabs key DOM references
+     const playButton = document.getElementById("play-button");
+      const scene = document.getElementById("scene");
+      const introVideo = document.getElementById("intro-video");
+      const menu= document.getElementById("menubtn");
+      //const rightButtons = document.getElementById("rightbtns");
+      const videoSky = document.getElementById("video-sky");
+      const homebtn = document.getElementById("home");
+      const optbtn = document.getElementById("options");
+      
+
+      // Grab references for all videos (so we can pause them as needed)
+      const allVideos = [
+        document.getElementById("intro-video"),
+        document.getElementById("scene-two-video"),
+        document.getElementById("scene-three-video"),
+        document.getElementById("scene-four-video"),
+        document.getElementById("scene-five-video"),
+        document.getElementById("scene-six-video"),
+        document.getElementById("scene-seven-video"),
+        document.getElementById("scene-eight-video"),
+        document.getElementById("scene-nine-video") // remove if you only need 8
+      ];
+
+      // Start experience when user clicks the play button
+      playButton.addEventListener("click", () => {
+        playButton.style.display = "none"; // Hide HTML button
+        scene.style.visibility = "visible"; // Show the scene
+        // Start playing intro
+        introVideo.play().catch((e) => console.error(e));
+        introVideo.muted = false;
+        // Hide home button entity for now
+        //homeButtonEntity.classList.add("hidden");
+      });
+
+      // Show the "navigation" buttons near the end of the intro
+      introVideo.addEventListener("timeupdate", () => {
+        if (introVideo.duration - introVideo.currentTime <= 5) {
+          menu.setAttribute("visible", true);
+          
+          //homebtn.setAttribute("visible", true);
+        }
+      });
+
+      
+
+      // Switch to any given video by ID
+      function switchVideo(videoId) {
+        // Pause all
+        allVideos.forEach((vid) => vid.pause());
+
+        // Set sphere src to the new video asset
+        videoSky.setAttribute("src", `#${videoId}`);
+
+        // Reset video time and play
+        const newVideo = document.getElementById(videoId);
+        newVideo.currentTime = 0;
+        newVideo.muted = false; 
+        newVideo.play().catch((e) => console.error(e));
+
+        // Toggle home button visibility
+      if (videoId === "intro-video") {
+        menu.setAttribute("visible", true);
+        homebtn.setAttribute("visible", false);
+        optbtn.setAttribute("visible", false);
+        homebtn.classList.add("hidden"); // Hide home button when at intro
+      } else {
+        menu.setAttribute("visible", false);
+        homebtn.setAttribute("visible", true);
+        optbtn.setAttribute("visible", true);
+        homebtn.classList.remove("hidden"); // Show home button on other videos
+
+      }
+        
+      }
+
+      // Home button => returns to intro video
+            document.getElementById("home").addEventListener("click", () => {
+              switchVideo("intro-video");
+              introVideo.currentTime = introVideo.duration;
+              introVideo.pause();
+      });
+
+      // Add click event to toggle visibility
+      optbtn.addEventListener("click", () => {
+        const isVisible = menu.getAttribute("visible");
+        menu.setAttribute("visible", !isVisible); // Toggle visibility
+      });
+
+      // Make each button switch to its corresponding video
+      document.getElementById("ommlab").addEventListener("click", () => {
+        switchVideo("scene-two-video");
+      });
+      document.getElementById("anatomy").addEventListener("click", () => {
+        switchVideo("scene-three-video");
+      }); 
+      document.getElementById("clinical").addEventListener("click", () => {
+        switchVideo("scene-four-video");
+      });
+      document.getElementById("translation").addEventListener("click", () => {
+        switchVideo("scene-five-video");
+      });
+      document.getElementById("cafe").addEventListener("click", () => {
+        switchVideo("scene-six-video");
+      });
+      document.getElementById("study").addEventListener("click", () => {
+        switchVideo("scene-seven-video");
+      });
+      document.getElementById("fitness").addEventListener("click", () => {
+        switchVideo("scene-eight-video");
+      });
+      document.getElementById("admin").addEventListener("click", () => {
+        switchVideo("scene-nine-video");
+      });
+
+      
+
+      // Hover and click interactions for all .clickable items
+      document.querySelectorAll(".clickable").forEach((button) => {
+        button.addEventListener("mouseenter", () => {
+          button.setAttribute("scale", "1.1 1.1 1"); // Enlarge on hover
+          button.setAttribute("material", "color: #FFFF00"); // Turn yellow
+        });
+
+        button.addEventListener("mouseleave", () => {
+          button.setAttribute("scale", "1 1 1"); // Reset scale
+          button.setAttribute("material", "color: #FFFFFF"); // Reset color
+        });
+
+        button.addEventListener("click", () => {
+          console.log(`${button.id} clicked!`);
+        });
+      });
+  </script>
+</body>
+</html>
