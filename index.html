@@ -22,6 +22,10 @@
     }
     .hidden {
       display: none;
+      pointer-events: none; /* Disable clicks */
+    }
+    .clickable {
+      pointer-events: auto; /* Enable clicks for clickable items */
     }
   </style>
 </head>
@@ -33,8 +37,8 @@
       <video id="scene-two-video" src="http://m2qall8jajdg-hls-push.5centscdn.com/mp4/HCOMVideos/OMM.mp4" crossorigin="anonymous" playsinline muted preload="auto"></video>
       <video id="scene-three-video" src="http://m2qall8jajdg-hls-push.5centscdn.com/mp4/HCOMVideos/Anatomy.mp4" crossorigin="anonymous" playsinline muted preload="auto"></video>
       <video id="scene-four-video" src="http://m2qall8jajdg-hls-push.5centscdn.com/mp4/HCOMVideos/CTAC.mp4" crossorigin="anonymous" playsinline muted preload="auto"></video>
-      <video id="scene-five-video" src="http://m2qall8jajdg-hls-push.5centscdn.com/mp4/HCOMVideos/Student.mp4" crossorigin="anonymous" playsinline muted preload="auto"></video>
-      <video id="scene-six-video" src="" crossorigin="anonymous" playsinline muted preload="auto"></video>
+      <video id="scene-five-video" src=".mp4" crossorigin="anonymous" playsinline muted preload="auto"></video>
+      <video id="scene-six-video" src="http://m2qall8jajdg-hls-push.5centscdn.com/mp4/HCOMVideos/Student" crossorigin="anonymous" playsinline muted preload="auto"></video>
       <video id="scene-seven-video" src="http://m2qall8jajdg-hls-push.5centscdn.com/mp4/HCOMVideos/Classrooms.mp4" crossorigin="anonymous" playsinline muted preload="auto"></video>
       <video id="scene-eight-video" src="http://m2qall8jajdg-hls-push.5centscdn.com/mp4/HCOMVideos/Fitness.mp4" crossorigin="anonymous" playsinline muted preload="auto"></video>
       <video id="scene-nine-video" src="http://m2qall8jajdg-hls-push.5centscdn.com/mp4/HCOMVideos/Admission.mp4" crossorigin="anonymous" playsinline muted preload="auto"></video>
@@ -53,117 +57,110 @@
     <a-camera>
       <a-cursor raycaster="objects: .clickable" color="yellow"></a-cursor>
     </a-camera>
-    <!-- Left Column Buttons -->
     <a-entity id="menubtn" position="-0.05 0 0" class="hidden" visible="false">
-      <!-- Left Column Buttons -->
       <a-image src="#ommlab-normal" width="1.5" height="0.39" position="-1.5 1.25 -5" class="clickable" id="ommlab"></a-image>
       <a-image src="#anatomy-normal" width="1.5" height="0.39" position="-1.5 0.75 -5" class="clickable" id="anatomy"></a-image>
       <a-image src="#clinical-normal" width="1.5" height="0.39" position="-1.5 0.25 -5" class="clickable" id="clinical"></a-image>
       <a-image src="#translation-normal" width="1.5" height="0.39" position="-1.5 -0.25 -5" class="clickable" id="translation"></a-image>
-    
-      <!-- Right Column Buttons -->
       <a-image src="#cafe-normal" width="1.5" height="0.39" position="1.5 1.25 -5" class="clickable" id="cafe"></a-image>
       <a-image src="#study-normal" width="1.5" height="0.39" position="1.5 0.75 -5" class="clickable" id="study"></a-image>
       <a-image src="#fitness-normal" width="1.5" height="0.39" position="1.5 0.25 -5" class="clickable" id="fitness"></a-image>
       <a-image src="#admin-normal" width="1.5" height="0.39" position="1.5 -0.25 -5" class="clickable" id="admin"></a-image>
     </a-entity>
-    
-
-    <a-entity id="home" position="0 -1 -5" class="hidden" visible="false">
+    <a-entity id="home" position="-0.762 -1 -5" class="hidden" visible="false">
       <a-image src="#homebtn" width="1.5" height="0.39" position="-0.234 0 0.01" class="clickable" id="homebtn"></a-image>
     </a-entity>
-    <a-entity id="options" position="2 -1 -5" class="hidden" visible="false">
+    <a-entity id="options" position="1.238 -1 -5" class="hidden" visible="false">
       <a-image src="#optionsbtn" width="1.5" height="0.39" position="-0.454 0 0.01" class="clickable" id="optionbtn"></a-image>
     </a-entity>
   </a-scene>
 
-  <script>
-    // Grabs key DOM references
-    const playButton = document.getElementById("play-button");
-    const scene = document.getElementById("scene");
-    const introVideo = document.getElementById("intro-video");
-    const menu = document.getElementById("menubtn");
-    const videoSky = document.getElementById("video-sky");
-    const homebtn = document.getElementById("home");
-    const optbtn = document.getElementById("options");
-    
-    // Grab references for all videos (so we can pause them as needed)
-    const allVideos = [
-      document.getElementById("intro-video"),
-      document.getElementById("scene-two-video"),
-      document.getElementById("scene-three-video"),
-      document.getElementById("scene-four-video"),
-      document.getElementById("scene-five-video"),
-      document.getElementById("scene-six-video"),
-      document.getElementById("scene-seven-video"),
-      document.getElementById("scene-eight-video"),
-      document.getElementById("scene-nine-video") // remove if you only need 8
-    ];
+ <script>
+  const playButton = document.getElementById("play-button");
+  const scene = document.getElementById("scene");
+  const introVideo = document.getElementById("intro-video");
+  const menu = document.getElementById("menubtn");
+  const videoSky = document.getElementById("video-sky");
+  const homebtn = document.getElementById("home");
+  const optbtn = document.getElementById("options");
+  const cursor = document.querySelector("a-cursor");
 
-    // Start experience when user clicks the play button
-    playButton.addEventListener("click", () => {
-      playButton.style.display = "none"; // Hide HTML button
-      scene.style.visibility = "visible"; // Show the scene
-      // Start playing intro
-      introVideo.play().catch((e) => console.error(e));
-      introVideo.muted = false;
-    });
+  const allVideos = [
+    document.getElementById("intro-video"),
+    document.getElementById("scene-two-video"),
+    document.getElementById("scene-three-video"),
+    document.getElementById("scene-four-video"),
+    document.getElementById("scene-five-video"),
+    document.getElementById("scene-six-video"),
+    document.getElementById("scene-seven-video"),
+    document.getElementById("scene-eight-video"),
+    document.getElementById("scene-nine-video")
+  ];
 
-    // Show the "navigation" buttons near the end of the intro
-    introVideo.addEventListener("timeupdate", () => {
-      if (introVideo.duration - introVideo.currentTime <= 4 && introVideo.currentTime > 0) {
-        menu.setAttribute("visible", true);
-        menu.setAttribute("class", ""); // Remove the "hidden" class to make the menu visible
-        menu.setAttribute("visible", true);
-      }
-    });
+  // Disable cursor interactions initially
+  cursor.setAttribute("raycaster", "objects: none");
 
-    // Switch to any given video by ID
-    function switchVideo(videoId) {
-      // Pause all
-      allVideos.forEach((vid) => vid.pause());
+  playButton.addEventListener("click", () => {
+    playButton.style.display = "none";
+    scene.style.visibility = "visible";
+    introVideo.play().catch((e) => console.error(e));
+    introVideo.muted = false;
+  });
 
-      // Set sphere src to the new video asset
-      videoSky.setAttribute("src", `#${videoId}`);
-
-      // Reset video time and play
-      const newVideo = document.getElementById(videoId);
-      newVideo.currentTime = 0;
-      newVideo.muted = false; 
-      newVideo.play().catch((e) => console.error(e));
-
-      // Toggle home button visibility
-      if (videoId === "intro-video") {
-        menu.setAttribute("visible", true);
-        homebtn.setAttribute("visible", false);
-        optbtn.setAttribute("visible", false);
-        homebtn.classList.add("hidden"); // Hide home button when at intro
-      } else {
-        menu.setAttribute("visible", false);
-        homebtn.setAttribute("visible", true);
-        optbtn.setAttribute("visible", true);
-        homebtn.classList.remove("hidden"); // Show home button on other videos
-      }
+  introVideo.addEventListener("timeupdate", () => {
+    if (introVideo.duration - introVideo.currentTime <= 4 && introVideo.currentTime > 0) {
+      menu.setAttribute("visible", true);
+      menu.classList.remove("hidden");
+      // Enable cursor interactions when the menu appears
+      cursor.setAttribute("raycaster", "objects: .clickable");
     }
+  });
 
-    // Home button => returns to intro video
-    document.getElementById("home").addEventListener("click", () => {
-      switchVideo("intro-video");
-      introVideo.currentTime = introVideo.duration;
-      introVideo.pause();
-    });
+  function switchVideo(videoId) {
+    allVideos.forEach((vid) => vid.pause());
+    videoSky.setAttribute("src", `#${videoId}`);
+    const newVideo = document.getElementById(videoId);
+    newVideo.currentTime = 0;
+    newVideo.muted = false;
+    newVideo.play().catch((e) => console.error(e));
 
-    // Add click event to toggle visibility
-    optbtn.addEventListener("click", () => {
-      const isVisible = menu.getAttribute("visible");
-      menu.setAttribute("visible", !isVisible); // Toggle visibility
-    });
+    if (videoId === "intro-video") {
+      menu.setAttribute("visible", true);
+      homebtn.setAttribute("visible", false);
+      optbtn.setAttribute("visible", false);
+      homebtn.classList.add("hidden");
+    } else {
+      menu.setAttribute("visible", false);
+      homebtn.setAttribute("visible", true);
+      optbtn.setAttribute("visible", true);
+      homebtn.classList.remove("hidden");
+    }
+  }
+   
+   // Add click event to toggle menu visibility
+  optbtn.addEventListener("click", () => {
+    const isVisible = menu.getAttribute("visible"); // Check current visibility
+    menu.setAttribute("visible", !isVisible); // Toggle visibility
+    if (!isVisible) {
+      menu.classList.remove("hidden");
+    } else {
+      menu.classList.add("hidden");
+    }
+  });
 
-    // Make each button switch to its corresponding video
-    document.getElementById("ommlab").addEventListener("click", () => {
-      switchVideo("scene-two-video");
-    });
-    document.getElementById("anatomy").addEventListener("click", () => {
+  document.getElementById("home").addEventListener("click", () => {
+    switchVideo("intro-video");
+    introVideo.currentTime = introVideo.duration;
+    introVideo.pause();
+  });
+   
+     document.getElementById("ommlab").addEventListener("click", () => {
+    switchVideo("scene-two-video");
+    introVideo.currentTime = introVideo.duration;
+    introVideo.pause();
+  });
+   
+   document.getElementById("anatomy").addEventListener("click", () => {
       switchVideo("scene-three-video");
     });
     document.getElementById("clinical").addEventListener("click", () => {
@@ -185,22 +182,25 @@
       switchVideo("scene-nine-video");
     });
 
-    // Hover and click interactions for all .clickable items
-    document.querySelectorAll(".clickable").forEach((button) => {
-      button.addEventListener("mouseenter", () => {
-        button.setAttribute("scale", "1.1 1.1 1"); // Enlarge on hover
-        button.setAttribute("material", "color: #FFFF00"); // Turn yellow
-      });
 
-      button.addEventListener("mouseleave", () => {
-        button.setAttribute("scale", "1 1 1"); // Reset scale
-        button.setAttribute("material", "color: #FFFFFF"); // Reset color
-      });
-
-      button.addEventListener("click", () => {
-        console.log(`${button.id} clicked!`);
-      });
+  document.querySelectorAll(".clickable").forEach((button) => {
+    button.addEventListener("mouseenter", () => {
+      button.setAttribute("scale", "1.1 1.1 1");
+      button.setAttribute("material", "color: #FFFF00");
     });
-  </script>
+
+    button.addEventListener("mouseleave", () => {
+      button.setAttribute("scale", "1 1 1");
+      button.setAttribute("material", "color: #FFFFFF");
+    });
+
+    button.addEventListener("click", () => {
+      console.log(`${button.id} clicked!`);
+    });
+  });
+</script>
+
+</script>
+
 </body>
 </html>
