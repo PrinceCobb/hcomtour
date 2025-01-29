@@ -50,7 +50,7 @@
       <img id="fitness-normal" src="http://m2qall8jajdg-hls-push.5centscdn.com/btn/Fitness.png" crossorigin="anonymous" />
       <img id="study-normal" src="http://m2qall8jajdg-hls-push.5centscdn.com/btn/Classroom.png" crossorigin="anonymous" />
       <img id="translation-normal" src="http://m2qall8jajdg-hls-push.5centscdn.com/btn/Translational.png" crossorigin="anonymous" />
-      <img id="homebtn" src="http://m2qall8jajdg-hls-push.5centscdn.com/btn/Home.png" crossorigin="anonymous" />
+      <img id="homebtn" src="http://m2qall8jajdg-hls-push.5centscdn.com/btn/shwoptns.png" crossorigin="anonymous" />
       <img id="optionsbtn" src="http://m2qall8jajdg-hls-push.5centscdn.com/btn/showoptionsbtn2.png" crossorigin="anonymous" />
     </a-assets>
     <a-videosphere id="video-sky" src="#intro-video" rotation="0 268 0" ></a-videosphere>
@@ -67,12 +67,12 @@
       <a-image src="#fitness-normal" width="1.5" height="0.39" position="1.5 0.25 -5" class="clickable" id="fitness"></a-image>
       <a-image src="#admin-normal" width="1.5" height="0.39" position="1.5 -0.25 -5" class="clickable" id="admin"></a-image>
     </a-entity>
-    <a-entity id="home" position="-0.762 -1 -5" class="hidden" visible="false">
+    <a-entity id="home" position="-0.382 -1 -5" class="hidden" visible="false">
       <a-image src="#homebtn" width="1.5" height="0.39" position="-0.234 0 0.01" class="clickable" id="homebtn"></a-image>
     </a-entity>
-    <a-entity id="options" position="1.238 -1 -5" class="hidden" visible="false">
+     <!-- <a-entity id="options" position="1.238 -1 -5" class="hidden" visible="false">
       <a-image src="#optionsbtn" width="1.5" height="0.39" position="-0.454 0 0.01" class="clickable" id="optionbtn"></a-image>
-    </a-entity>
+    </a-entity> -->
   </a-scene>
 
  <script>
@@ -82,7 +82,7 @@
   const menu = document.getElementById("menubtn");
   const videoSky = document.getElementById("video-sky");
   const homebtn = document.getElementById("home");
-  const optbtn = document.getElementById("options");
+   <!--const optbtn = document.getElementById("options"); -->
   const cursor = document.querySelector("a-cursor");
 
   const allVideos = [
@@ -127,26 +127,26 @@
     if (videoId === "intro-video") {
       menu.setAttribute("visible", true);
       homebtn.setAttribute("visible", false);
-      optbtn.setAttribute("visible", false);
+      //optbtn.setAttribute("visible", false);
       homebtn.classList.add("hidden");
     } else {
       menu.setAttribute("visible", false);
       homebtn.setAttribute("visible", true);
-      optbtn.setAttribute("visible", true);
+     // optbtn.setAttribute("visible", true);
       homebtn.classList.remove("hidden");
     }
   }
    
    // Add click event to toggle menu visibility
-  optbtn.addEventListener("click", () => {
-    const isVisible = menu.getAttribute("visible"); // Check current visibility
-    menu.setAttribute("visible", !isVisible); // Toggle visibility
-    if (!isVisible) {
-      menu.classList.remove("hidden");
-    } else {
-      menu.classList.add("hidden");
-    }
-  });
+  //optbtn.addEventListener("click", () => {
+    //const isVisible = menu.getAttribute("visible"); // Check current visibility
+    //menu.setAttribute("visible", !isVisible); // Toggle visibility
+    //if (!isVisible) {
+      //menu.classList.remove("hidden");
+    //} else {
+     // menu.classList.add("hidden");
+    //}
+  //}); -->
 
   document.getElementById("home").addEventListener("click", () => {
     switchVideo("intro-video");
