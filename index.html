@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>HCOM Tour</title>
+  <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
   <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
   <style>
     #play-button {
@@ -33,7 +34,8 @@
   <button id="play-button">Start Experience</button>
   <a-scene id="scene" loading-screen="enabled:false">
     <a-assets>
-      <video id="intro-video" src="http://m2qall8jajdg-hls-push.5centscdn.com/mp4/small/intro.mp4/playlist.m3u8" crossorigin="anonymous" playsinline muted preload="auto"></video>
+      <video id="intro-video" crossorigin="anonymous" playsinline muted preload="metadata"></video>
+      <!-- <video id="intro-video" src="http://m2qall8jajdg-hls-push.5centscdn.com/mp4/webm/intro.mp4" crossorigin="anonymous" playsinline muted preload="auto"></video> -->
       <video id="scene-two-video" src="http://m2qall8jajdg-hls-push.5centscdn.com/mp4/small/OMM.mp4" crossorigin="anonymous" playsinline muted preload="auto"></video>
       <video id="scene-three-video" src="http://m2qall8jajdg-hls-push.5centscdn.com/mp4/small/Anatomy.mp4" crossorigin="anonymous" playsinline muted preload="auto"></video>
       <video id="scene-four-video" src="http://m2qall8jajdg-hls-push.5centscdn.com/mp4/small/CTAC.mp4" crossorigin="anonymous" playsinline muted preload="auto"></video>
@@ -97,6 +99,24 @@ const allVideos = [
   fifthVideo, sixthVideo, sevVideo, eigVideo, nineVideo
 ];
 
+document.addEventListener("DOMContentLoaded", () => {
+  const introVideo = document.getElementById("intro-video");
+  const hlsUrl = 'http://m2qall8jajdg-hls-push.5centscdn.com/mp4/small/intro.mp4/playlist.m3u8';
+
+  if (Hls.isSupported()) {
+    const hls = new Hls();
+    hls.loadSource(hlsUrl);
+    hls.attachMedia(introVideo);
+    hls.on(Hls.Events.MANIFEST_PARSED, () => {
+      console.log("HLS manifest loaded; ready to play intro video.");
+    });
+  } else if (introVideo.canPlayType('application/vnd.apple.mpegurl')) {
+    introVideo.src = hlsUrl;
+  } else {
+    console.error("HLS not supported on this device/browser.");
+  }
+});
+
 //  Disable cursor interactions at the start
 cursor.setAttribute("raycaster", "objects: none");
 
@@ -105,11 +125,15 @@ playButton.addEventListener("click", () => {
   playButton.style.display = "none";
   scene.style.visibility = "visible";
 
-  introVideo.muted = false; // Unmute
-  introVideo.currentTime = 0; // Restart the video
-  introVideo.play().catch((e) => console.error("Playback Error:", e));
-});
+  // Unmute the video both via property and attribute
+  introVideo.muted = false;
+  introVideo.removeAttribute("muted");
 
+  introVideo.currentTime = 0;
+  introVideo.play().then(() => {
+    console.log("Video playing with audio.");
+  }).catch((e) => console.error("Playback Error:", e));
+});
 //  Store last timestamp for `intro-video`
 let introVideoPauseTime = 0;
 
