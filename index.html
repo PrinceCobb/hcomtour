@@ -263,21 +263,39 @@ document.querySelectorAll(".clickable").forEach((button) => {
     });
   });
 
-   // Force playback on iOS by listening for a touch event
+    // Ensure playsinline & autoplay permissions
+    introVideo.setAttribute("playsinline", "true");
+    introVideo.setAttribute("muted", "true");
+
+    // Step 1: Allow playback after user interaction
+    playButton.addEventListener("click", () => {
+      playButton.classList.add("hidden"); // Hide button
+
+      introVideo.muted = false; // Unmute (required after click)
+      introVideo.play().then(() => {
+        console.log("Video playing successfully.");
+      }).catch((error) => {
+        console.error("Playback Error:", error);
+      });
+    });
+
+    // Step 2: iOS Touch Event Fallback
     document.body.addEventListener("touchstart", () => {
       introVideo.play().catch((e) => console.error("iOS Touch Play Error:", e));
     }, { once: true });
 
-    // Ensure video is loaded before playing
+    // Step 3: Ensure the video is loaded before playing
     introVideo.addEventListener("canplaythrough", () => {
       console.log("Video can play through, starting playback.");
       introVideo.play();
     });
 
-    // Debugging logs
+    // Step 4: Debugging - Catch errors
     introVideo.addEventListener("error", (e) => {
       console.error("Video error:", e);
     });
+
+  </script>
 
 </body>
 </html>
