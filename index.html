@@ -33,7 +33,7 @@
   <button id="play-button">Start Experience</button>
   <a-scene id="scene" loading-screen="enabled:false">
     <a-assets>
-      <video id="intro-video" src="http://m2qall8jajdg-hls-push.5centscdn.com/mp4/webm/intro.mp4" crossorigin="anonymous" playsinline muted preload="auto"></video>
+      <video id="intro-video" src="http://m2qall8jajdg-hls-push.5centscdn.com/mp4/small/intro.mp4" crossorigin="anonymous" playsinline muted preload="auto"></video>
       <video id="scene-two-video" src="http://m2qall8jajdg-hls-push.5centscdn.com/mp4/small/OMM.mp4" crossorigin="anonymous" playsinline muted preload="auto"></video>
       <video id="scene-three-video" src="http://m2qall8jajdg-hls-push.5centscdn.com/mp4/small/Anatomy.mp4" crossorigin="anonymous" playsinline muted preload="auto"></video>
       <video id="scene-four-video" src="http://m2qall8jajdg-hls-push.5centscdn.com/mp4/small/CTAC.mp4" crossorigin="anonymous" playsinline muted preload="auto"></video>
@@ -97,10 +97,10 @@ const allVideos = [
   fifthVideo, sixthVideo, sevVideo, eigVideo, nineVideo
 ];
 
-//  Disable cursor interactions at the start
+// 🚀 Disable cursor interactions at the start
 cursor.setAttribute("raycaster", "objects: none");
 
-//  Play Experience Button
+// ✅ Play Experience Button
 playButton.addEventListener("click", () => {
   playButton.style.display = "none";
   scene.style.visibility = "visible";
@@ -110,40 +110,55 @@ playButton.addEventListener("click", () => {
   introVideo.play().catch((e) => console.error("Playback Error:", e));
 });
 
-//  Store last timestamp for `intro-video`
+// ✅ Store last timestamp for `intro-video`
 let introVideoPauseTime = 0;
 
-// Handle Video End Logic
-function handleVideoEnd(video) {
+// ✅ Handle Video Logic (Cursor Activation & Home Button)
+function handleVideoProgress(video) {
+  video.addEventListener("timeupdate", () => {
+    if (video.duration - video.currentTime <= 4) {
+      console.log(`4 seconds remaining in ${video.id}, enabling cursor.`);
+      
+      // ✅ Show home button 4 seconds before video ends (for non-intro videos)
+      if (video.id !== "intro-video") {
+        homebtn.setAttribute("visible", true);
+        homebtn.classList.remove("hidden");
+
+        // ✅ Enable cursor interactions when home button appears
+        cursor.setAttribute("raycaster", "objects: .clickable");
+      }
+    }
+  });
+
   video.addEventListener("ended", () => {
     console.log(`Video ${video.id} ended.`);
 
     if (video.id === "intro-video") {
-      //  Show menu only after intro video
+      // ✅ Show menu only after intro video
       menu.setAttribute("visible", true);
       menu.classList.remove("hidden");
 
-      //  Enable cursor interactions for menu
+      // ✅ Enable cursor interactions for menu
       cursor.setAttribute("raycaster", "objects: .clickable");
     } else {
-      //  Hide menu for other videos
+      // ❌ Hide menu for other videos
       menu.setAttribute("visible", false);
       menu.classList.add("hidden");
 
-      //  Show home button at the end of other videos
+      // ✅ Show home button at the end of other videos
       homebtn.setAttribute("visible", true);
       homebtn.classList.remove("hidden");
 
-      //  Enable cursor interactions only when `homebtn` appears
+      // ✅ Ensure cursor is enabled when home button appears
       cursor.setAttribute("raycaster", "objects: .clickable");
     }
   });
 }
 
 // Attach event listener to each video
-allVideos.forEach(handleVideoEnd);
+allVideos.forEach(handleVideoProgress);
 
-//  Function to Switch Videos
+// ✅ Function to Switch Videos
 function switchVideo(videoId) {
   allVideos.forEach((vid) => vid.pause());
 
@@ -153,48 +168,48 @@ function switchVideo(videoId) {
   newVideo.muted = false;
   newVideo.play().catch((e) => console.error(e));
 
-  //  Hide Menu & Home Button During Video Play
+  // ✅ Hide Menu & Home Button During Video Play
   menu.setAttribute("visible", false);
   menu.classList.add("hidden");
 
   homebtn.setAttribute("visible", false);
   homebtn.classList.add("hidden");
 
-  //  Disable cursor interactions until the home button appears
+  // ❌ Disable cursor interactions until 4 seconds remain
   cursor.setAttribute("raycaster", "objects: none");
 
-  //  Show Home Button Only When NOT Intro Video
+  // ✅ Show Home Button Only When NOT Intro Video
   if (videoId === "intro-video") {
     homebtn.setAttribute("visible", false);
     homebtn.classList.add("hidden");
   }
 }
 
-//  Home Button Click: Return to Intro Video & Show Menu
+// ✅ Home Button Click: Return to Intro Video & Show Menu
 document.getElementById("home").addEventListener("click", () => {
   switchVideo("intro-video");
 
-  //  Resume intro video from where the menu appears (approx. last 4 seconds)
+  // ✅ Resume intro video from where the menu appears (approx. last 4 seconds)
   introVideo.currentTime = introVideoPauseTime || (introVideo.duration - 4);
   introVideo.pause(); // Pause it so menu is visible immediately
   console.log(`Returning to intro video at ${introVideo.currentTime} seconds.`);
 
-  //  Show the menu immediately when home button is clicked
+  // ✅ Show the menu immediately when home button is clicked
   menu.setAttribute("visible", true);
   menu.classList.remove("hidden");
 
-  //  Enable cursor interactions when returning to intro video
+  // ✅ Enable cursor interactions when returning to intro video
   cursor.setAttribute("raycaster", "objects: .clickable");
 });
 
-//  Track when intro video reaches the menu moment
+// ✅ Track when intro video reaches the menu moment
 introVideo.addEventListener("timeupdate", () => {
   if (introVideo.duration - introVideo.currentTime <= 4) {
     introVideoPauseTime = introVideo.currentTime; // Save the timestamp
   }
 });
 
-// Click Events for Switching Videos
+// ✅ Click Events for Switching Videos
 document.getElementById("ommlab").addEventListener("click", () => switchVideo("scene-two-video"));
 document.getElementById("anatomy").addEventListener("click", () => switchVideo("scene-three-video"));
 document.getElementById("clinical").addEventListener("click", () => switchVideo("scene-four-video"));
@@ -204,7 +219,7 @@ document.getElementById("study").addEventListener("click", () => switchVideo("sc
 document.getElementById("fitness").addEventListener("click", () => switchVideo("scene-eight-video"));
 document.getElementById("admin").addEventListener("click", () => switchVideo("scene-nine-video"));
 
-//  Button Hover Effects
+// ✅ Button Hover Effects
 document.querySelectorAll(".clickable").forEach((button) => {
   button.addEventListener("mouseenter", () => {
     button.setAttribute("scale", "1.1 1.1 1");
@@ -221,25 +236,7 @@ document.querySelectorAll(".clickable").forEach((button) => {
   });
 });
 
-   // Ensuring video can play on iOS
-    function playVideo(video) {
-      video.play().then(() => {
-        video.muted = false;  // Unmute after interaction
-      }).catch(error => {
-        console.error("Video playback failed:", error);
-      });
-    }
-
-    // User interaction to enable playback
-    playButton.addEventListener("click", () => {
-      playButton.classList.add("hidden");  // Hide button
-      playVideo(introVideo);
-    });
-
-    // Update A-Frame texture when the video is ready
-    introVideo.addEventListener("canplaythrough", () => {
-      videoSky.setAttribute("src", "#intro-video");
-    });
+</script>
 
 </body>
 </html>
