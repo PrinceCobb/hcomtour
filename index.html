@@ -262,6 +262,26 @@ document.querySelectorAll(".clickable").forEach((button) => {
       console.log("Experience started, playing intro video.");
     });
   });
+
+   // Ensuring video can play on iOS
+    function playVideo(video) {
+      video.play().then(() => {
+        video.muted = false;  // Unmute after interaction
+      }).catch(error => {
+        console.error("Video playback failed:", error);
+      });
+    }
+
+    // User interaction to enable playback
+    playButton.addEventListener("click", () => {
+      playButton.classList.add("hidden");  // Hide button
+      playVideo(introVideo);
+    });
+
+    // Update A-Frame texture when the video is ready
+    introVideo.addEventListener("canplaythrough", () => {
+      videoSky.setAttribute("src", "#intro-video");
+    });
 </script>
 
 </body>
