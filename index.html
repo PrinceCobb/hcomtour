@@ -221,48 +221,5 @@ document.querySelectorAll(".clickable").forEach((button) => {
   });
 });
 
-   // Function to enhance video performance on Android
-  document.addEventListener("DOMContentLoaded", () => {
-    const allVideos = document.querySelectorAll("video");
-
-    // Apply best practices for mobile streaming
-    allVideos.forEach((video) => {
-      video.setAttribute("preload", "auto"); // Preload improves playback
-      video.setAttribute("playsinline", "true");
-      video.setAttribute("muted", "true"); // Required for autoplay on mobile
-      video.setAttribute("autoplay", "false"); // Start manually after interaction
-      video.setAttribute("controls", "false");
-      video.setAttribute("loop", "false");
-
-      // Event listeners to recover from buffering issues
-      video.addEventListener("waiting", () => {
-        console.warn(`Buffering detected in ${video.id}, attempting recovery...`);
-      });
-
-      video.addEventListener("stalled", () => {
-        console.warn(`Network stalled for ${video.id}, retrying...`);
-        video.play().catch((e) => console.error("Playback Error:", e));
-      });
-
-      video.addEventListener("error", (e) => {
-        console.error(`Error loading video: ${video.id}`, e);
-      });
-    });
-
-    // Ensure videos only start after user interaction
-    const playButton = document.getElementById("play-button");
-    playButton.addEventListener("click", () => {
-      playButton.style.display = "none";
-
-      // Play the intro video (ensuring unmuted)
-      const introVideo = document.getElementById("intro-video");
-      introVideo.muted = false;
-      introVideo.play().catch((e) => console.error("Playback Error:", e));
-
-      console.log("Experience started, playing intro video.");
-    });
-  });
-</script>
-
 </body>
 </html>
