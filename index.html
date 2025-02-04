@@ -39,6 +39,7 @@
   height: 40px;
   z-index: 10;
   cursor: pointer;
+  display: none; /* Hide initially */
 } 
   </style>
 </head>
@@ -135,6 +136,19 @@ document.addEventListener("DOMContentLoaded", () => {
   } else {
     console.error("HLS not supported on this device/browser.");
   }
+  
+  // Show menu 8 seconds before the intro video ends
+  introVideo.addEventListener("timeupdate", () => {
+    if (introVideo.duration - introVideo.currentTime <= 5) {
+      menu.setAttribute("visible", true);
+      menu.classList.remove("hidden");
+
+      // Enable cursor interactions for menu
+      cursor.setAttribute("raycaster", "objects: .clickable");
+ 
+      console.log("Menu displayed 8 seconds before the intro video ends.");
+    }
+  });
 });
 
 //  Disable cursor interactions at the start
@@ -144,10 +158,11 @@ cursor.setAttribute("raycaster", "objects: none");
 playButton.addEventListener("click", () => {
   playButton.style.display = "none";
   scene.style.visibility = "visible";
+  skipButton.style.display = "block"; // Show the Skip button
 
   // Unmute the video both via property and attribute
   introVideo.muted = false;
-  introVideo.removeAttribute("muted");
+  introVideo.removeAttribute("muted"); 
 
   introVideo.currentTime = 0;
   introVideo.play().then(() => {
