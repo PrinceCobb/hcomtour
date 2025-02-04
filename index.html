@@ -277,10 +277,11 @@ document.addEventListener("DOMContentLoaded", () => {
   const introVideo = document.getElementById("intro-video");
   const hlsUrl = 'https://m2qall8jajdg-hls-push.5centscdn.com/mp4/comp/intro-test.mp4/playlist.m3u8';
 
-  //Stop browser from preloading or playing video 
+  //Stop browser from preloading or playing video
   introVideo.pause();
   introVideo.currentTime = 0; // Ensure it starts at 0
-  introVideo.removeAttribute("src"); // Prevents loading automatically
+  introVideo.removeAttribute("src"); // Prevents auto-loading
+  menu.classList.add("hidden"); // Hide menu initially
 
   playButton.addEventListener("click", () => {
     playButton.style.display = "none"; // Hide Start Experience button
@@ -303,6 +304,19 @@ document.addEventListener("DOMContentLoaded", () => {
       introVideo.play().catch((e) => console.error("Playback Error:", e));
     } else {
       console.error("HLS not supported on this browser.");
+    }
+  });
+
+  // 🚀 Show Menu 5 Seconds Before the Intro Video Ends
+  introVideo.addEventListener("timeupdate", () => {
+    if (introVideo.duration - introVideo.currentTime <= 5) {
+      menu.setAttribute("visible", true);
+      menu.classList.remove("hidden");
+
+      // Enable cursor interactions for menu
+      cursor.setAttribute("raycaster", "objects: .clickable");
+
+      console.log("Menu displayed 5 seconds before the intro video ends.");
     }
   });
 });
