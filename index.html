@@ -176,6 +176,14 @@ const allVideos = [
   introVideo, secVideo, thirdVideo, fourthVideo,
   fifthVideo, sixthVideo, sevVideo, eigVideo, nineVideo
 ]; 
+   
+   document.addEventListener("DOMContentLoaded", () => {
+  const introVideo = document.getElementById("intro-video");
+  introVideo.pause();
+  introVideo.currentTime = 0; 
+  introVideo.muted = true; // Keep muted until user interaction
+});
+
    // Hide controls initially
 playPauseButton.style.display = "none";
 videoControls.style.display = "none";
@@ -303,21 +311,16 @@ cursor.setAttribute("raycaster", "objects: none");
 
 //  Play Experience Button
 playButton.addEventListener("click", () => {
-  playButton.style.display = "none"; // Hide Start Experience button  
-  scene.style.visibility = "visible"; // Show the A-Frame scene
+  playButton.style.display = "none"; // Hide the Start button
+  scene.style.visibility = "visible"; // Show A-Frame scene
   skipButton.style.display = "block"; // Show Skip button
-  
-  // Ensure video starts from the beginning and unmuted
+
+  // Ensure intro video starts only after clicking the button
   introVideo.muted = false;
-  introVideo.removeAttribute("muted"); // Ensures browsers allow sound
-  introVideo.currentTime = 0;
+  introVideo.currentTime = 0; // Start from the beginning
+
   introVideo.play().then(() => {
     console.log("Intro video started with sound.");
-    
-    // 🔥 Show play/pause button & timeline ONLY after clicking "Start Experience"
-    playPauseButton.style.display = "flex";
-    videoControls.style.display = "flex"; 
-
   }).catch((error) => {
     console.error("Playback Error:", error);
   });
