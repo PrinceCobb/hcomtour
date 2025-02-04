@@ -50,7 +50,7 @@
   width: 60px;
   height: 60px;
   z-index: 15;
-  background-color: rgba(0, 0, 0, 0.5);
+  background-color: rgba(0, 0, 0, 0.2);
   color: white;
   border: none;
   border-radius: 50%;
@@ -192,7 +192,7 @@ playPauseButton.addEventListener("click", () => {
     if (currentVideo.paused) {
       currentVideo.muted = false; // Ensure it's unmuted before playing
       currentVideo.play().then(() => {
-        playPauseButton.textContent = "⏸"; // Show Pause symbol
+        playPauseButton.textContent = "II"; // Show Pause symbol
         lastPlayedVideo = currentVideo; // Store last played video
       }).catch((error) => {
         console.error("Playback failed:", error);
@@ -211,7 +211,7 @@ allVideos.forEach((video) => {
   video.addEventListener("play", () => {
     lastPlayedVideo = video; // Track the currently playing video
     playPauseButton.style.display = "flex"; // Show play/pause button
-    playPauseButton.textContent = "⏸"; // Set to pause
+    playPauseButton.textContent = "II"; // Set to pause
   });
 
   video.addEventListener("pause", () => {
@@ -300,18 +300,20 @@ cursor.setAttribute("raycaster", "objects: none");
 
 //  Play Experience Button
 playButton.addEventListener("click", () => {
-  playButton.style.display = "none";
-  scene.style.visibility = "visible";
-  skipButton.style.display = "block"; // Show the Skip button
+  playButton.style.display = "none"; // Hide Start Experience button
+  scene.style.visibility = "visible"; // Show the A-Frame scene
+  skipButton.style.display = "block"; // Show Skip button
 
-  // Unmute the video both via property and attribute
+  // Ensure video starts from the beginning and unmuted
   introVideo.muted = false;
-  introVideo.removeAttribute("muted"); 
-
+  introVideo.removeAttribute("muted"); // Ensures browsers allow sound
   introVideo.currentTime = 0;
+
   introVideo.play().then(() => {
-    console.log("Video playing with audio.");
-  }).catch((e) => console.error("Playback Error:", e));
+    console.log("Intro video started with sound.");
+  }).catch((error) => {
+    console.error("Playback Error:", error);
+  });
 });
    
    // Skip Intro Functionality
