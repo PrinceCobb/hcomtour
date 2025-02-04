@@ -107,7 +107,7 @@
 
   <a-scene id="scene" loading-screen="enabled:false">
     <a-assets>
-      <video id="intro-video" crossorigin="anonymous" playsinline muted preload="metadata"></video>
+      <video id="intro-video" crossorigin="anonymous" playsinline preload="none"></video>  
       <!-- <video id="intro-video" src="introx2.mp4" crossorigin="anonymous" playsinline muted preload="auto"></video> -->
       <!-- <video id="intro-video" src="http://m2qall8jajdg-hls-push.5centscdn.com/mp4/webm/intro.mp4" crossorigin="anonymous" playsinline muted preload="auto"></video> -->
       <video id="scene-two-video" src="https://m2qall8jajdg-hls-push.5centscdn.com/mp4/comp/OMM.mp4" crossorigin="anonymous" playsinline muted preload="auto"></video>
@@ -177,12 +177,11 @@ const allVideos = [
   fifthVideo, sixthVideo, sevVideo, eigVideo, nineVideo
 ]; 
    
-// Prevent video from playing automatically
+// Step 1: Completely remove the video source on page load
     document.addEventListener("DOMContentLoaded", () => {
-      introVideo.pause();
-      introVideo.currentTime = 0; 
-      introVideo.muted = true;
-      console.log("Intro video is blocked from autoplay.");
+      introVideo.removeAttribute("src");  // Remove src
+      introVideo.load();  // Force browser to clear any preloaded content
+      console.log("Intro video source removed to block autoplay.");
     });
 
    // Hide controls initially
@@ -311,14 +310,15 @@ document.addEventListener("DOMContentLoaded", () => {
 cursor.setAttribute("raycaster", "objects: none");
 
 // Play Experience Button Click Event
+    // Step 2: Only load video when user clicks "Start Experience"
     playButton.addEventListener("click", () => {
       playButton.style.display = "none"; // Hide Start Experience button
       scene.style.visibility = "visible"; // Show A-Frame scene
       skipButton.style.display = "block"; // Show Skip button
 
-      // Load the video source only when the user clicks
+      // Attach video source dynamically only when button is clicked
       const hlsUrl = "https://m2qall8jajdg-hls-push.5centscdn.com/mp4/comp/intro-test.mp4/playlist.m3u8";
-
+      
       if (Hls.isSupported()) {
         const hls = new Hls();
         hls.loadSource(hlsUrl);
@@ -332,16 +332,22 @@ cursor.setAttribute("raycaster", "objects: none");
         console.error("HLS not supported on this browser.");
       }
 
-      introVideo.muted = false; // Unmute after interaction
+      // Set video properties after source is attached
+      introVideo.muted = false; // Unmute after user interacts
       introVideo.currentTime = 0; // Start from beginning
+      introVideo.pause(); // Ensure video is paused until explicitly played
+
+      console.log("Intro video loaded but still paused.");
+
+      // Set video to A-Frame videosphere
+      videoSphere.setAttribute("src", "#intro-video");
+
+      // Explicitly start video
       introVideo.play().then(() => {
         console.log("Intro video started.");
       }).catch((error) => {
         console.error("Playback Error:", error);
       });
-
-      // Set video to A-Frame videosphere
-      videoSphere.setAttribute("src", "#intro-video");
     });
 
     // Skip Intro Functionality
