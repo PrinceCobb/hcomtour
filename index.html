@@ -31,7 +31,7 @@
       pointer-events: auto; /* Enable clicks for clickable items */
     }
     
-    #skip-button {
+  #skip-button {
   position: absolute;
   top: calc(48% + 350px - 25px);
   left: calc(50% - 10px - 45px);
@@ -41,11 +41,37 @@
   cursor: pointer;
   display: none; /* Hide initially */
 } 
+    
+  #play-pause-button {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 80px;
+  height: 80px;
+  z-index: 15;
+  background-color: rgba(0, 0, 0, 0.5);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  font-size: 30px;
+  font-weight: bold;
+  cursor: pointer;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.hidden {
+  display: none;
+}
+
   </style>
 </head>
 <body>
   <button id="play-button">Start Experience</button>
-  <img id="skip-button" src="https://m2qall8jajdg-hls-push.5centscdn.com/btn/skipintro.png"</> 
+  <img id="skip-button" src="https://m2qall8jajdg-hls-push.5centscdn.com/btn/skipintro.png"/>
+  <button id="play-pause-button">▶</button>
   <a-scene id="scene" loading-screen="enabled:false">
     <a-assets>
       <video id="intro-video" crossorigin="anonymous" playsinline muted preload="metadata"></video>
@@ -54,7 +80,7 @@
       <video id="scene-two-video" src="https://m2qall8jajdg-hls-push.5centscdn.com/mp4/comp/OMM.mp4" crossorigin="anonymous" playsinline muted preload="auto"></video>
       <video id="scene-three-video" src="https://m2qall8jajdg-hls-push.5centscdn.com/mp4/comp/Anatomy.mp4" crossorigin="anonymous" playsinline muted preload="auto"></video>
       <video id="scene-four-video" src="https://m2qall8jajdg-hls-push.5centscdn.com/mp4/comp/CTAC.mp4" crossorigin="anonymous" playsinline muted preload="auto"></video>
-      <video id="scene-five-video" src=".mp4" crossorigin="anonymous" playsinline muted preload="auto"></video>
+      <video id="scene-five-video" src="" crossorigin="anonymous" playsinline muted preload="auto"></video>
       <video id="scene-six-video" src="https://m2qall8jajdg-hls-push.5centscdn.com/mp4/comp/Student.mp4" crossorigin="anonymous" playsinline muted preload="auto"></video>
       <video id="scene-seven-video" src="https://m2qall8jajdg-hls-push.5centscdn.com/mp4/comp/Classrooms.mp4" crossorigin="anonymous" playsinline muted preload="auto"></video>
       <video id="scene-eight-video" src="https://m2qall8jajdg-hls-push.5centscdn.com/mp4/comp/Fitness.mp4" crossorigin="anonymous" playsinline muted preload="auto"></video>
@@ -109,11 +135,60 @@ const videoSky = document.getElementById("video-sky");
 const homebtn = document.getElementById("home");
 const cursor = document.querySelector("a-cursor");
 const skipButton = document.getElementById("skip-button");
+const playPauseButton = document.getElementById("play-pause-button");
 
 const allVideos = [
   introVideo, secVideo, thirdVideo, fourthVideo,
   fifthVideo, sixthVideo, sevVideo, eigVideo, nineVideo
 ]; 
+   
+   let lastPlayedVideo = null; // Track the last played video
+
+// Function to get the currently playing video
+function getCurrentPlayingVideo() {
+  return allVideos.find((video) => !video.paused && video.readyState >= 3) || lastPlayedVideo;
+}
+
+// Play/Pause Button Click Event
+playPauseButton.addEventListener("click", () => {
+  const currentVideo = getCurrentPlayingVideo();
+
+  if (currentVideo) {
+    if (currentVideo.paused) {
+      currentVideo.muted = false; // Ensure it's unmuted before playing
+      currentVideo.play().then(() => {
+        playPauseButton.textContent = "⏸"; // Show Pause symbol
+        lastPlayedVideo = currentVideo; // Store last played video
+      }).catch((error) => {
+        console.error("Playback failed:", error);
+      });
+    } else {
+      currentVideo.pause();
+      playPauseButton.textContent = "▶"; // Show Play symbol
+    }
+  } else {
+    console.warn("No video is currently playing.");
+  }
+});
+
+// Ensure the play/pause button only appears when a video starts playing
+allVideos.forEach((video) => {
+  video.addEventListener("play", () => {
+    lastPlayedVideo = video; // Track the currently playing video
+    playPauseButton.style.display = "flex"; // Show play/pause button
+    playPauseButton.textContent = "⏸"; // Set to pause
+  });
+
+  video.addEventListener("pause", () => {
+    playPauseButton.style.display = "flex"; // Keep visible even when paused
+    playPauseButton.textContent = "▶"; // Set to play
+  });
+
+  video.addEventListener("ended", () => {
+    playPauseButton.style.display = "none"; // Hide button when video ends
+  });
+});
+
    
    // Ensure video does not autoplay on page load
 introVideo.pause();
@@ -146,10 +221,11 @@ document.addEventListener("DOMContentLoaded", () => {
       // Enable cursor interactions for menu
       cursor.setAttribute("raycaster", "objects: .clickable");
  
-      console.log("Menu displayed 8 seconds before the intro video ends.");
+      console.log("Menu displayed 5 seconds before the intro video ends.");
     }
-  });
+  }); 
 });
+   
 
 //  Disable cursor interactions at the start
 cursor.setAttribute("raycaster", "objects: none");
@@ -229,6 +305,7 @@ allVideos.forEach(handleVideoEnd);
 //  Function to Switch Videos
 function switchVideo(videoId) {
   allVideos.forEach((vid) => vid.pause());
+  skipButton.style.display = "none";
 
   videoSky.setAttribute("src", `#${videoId}`);
   const newVideo = document.getElementById(videoId);
