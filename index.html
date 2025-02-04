@@ -27,9 +27,8 @@
       display: none;
       pointer-events: none; /* Disable clicks */
     }
-    .clickable {
-      pointer-events: auto; /* Enable clicks for clickable items */
-    }
+    .hidden { display: none; pointer-events: none; }
+    .clickable { pointer-events: auto; }
     
   #skip-button {
   position: absolute;
@@ -44,13 +43,13 @@
     
   #play-pause-button {
   position: absolute;
-  top: calc(50% + 335px);
-  left: 14%;
+  top: calc(50% + 360px);
+  left: 12%;
   transform: translate(-50%, -50%);
   width: 50px;
   height: 50px;
   z-index: 15;
-  background-color: rgba(0, 0, 0, 0.2);
+  background-color: rgba(0, 0, 0, 0.0); 
   color: white;
   border: none;
   border-radius: 50%;
@@ -317,26 +316,12 @@ cursor.setAttribute("raycaster", "objects: none");
       skipButton.style.display = "block"; // Show Skip button
 
       // Attach video source dynamically only when button is clicked
-      const hlsUrl = "https://m2qall8jajdg-hls-push.5centscdn.com/mp4/comp/intro-test.mp4/playlist.m3u8";
-      
-      if (Hls.isSupported()) {
-        const hls = new Hls();
-        hls.loadSource(hlsUrl);
-        hls.attachMedia(introVideo);
-        hls.on(Hls.Events.MANIFEST_PARSED, () => {
-          console.log("HLS manifest loaded; ready to play intro video.");
-        });
-      } else if (introVideo.canPlayType("application/vnd.apple.mpegurl")) {
-        introVideo.src = hlsUrl;
-      } else {
-        console.error("HLS not supported on this browser.");
-      }
+      const videoUrl = "https://m2qall8jajdg-hls-push.5centscdn.com/mp4/comp/intro-test.mp4";
 
-      // Set video properties after source is attached
-      introVideo.muted = false; // Unmute after user interacts
+      introVideo.src = videoUrl;
+      introVideo.muted = false; // Ensure sound is ON
       introVideo.currentTime = 0; // Start from beginning
       introVideo.pause(); // Ensure video is paused until explicitly played
-
       console.log("Intro video loaded but still paused.");
 
       // Set video to A-Frame videosphere
@@ -344,7 +329,7 @@ cursor.setAttribute("raycaster", "objects: none");
 
       // Explicitly start video
       introVideo.play().then(() => {
-        console.log("Intro video started.");
+        console.log("Intro video started with sound.");
       }).catch((error) => {
         console.error("Playback Error:", error);
       });
