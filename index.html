@@ -47,8 +47,8 @@
   top: calc(50% + 340px);
   left: 13%;
   transform: translate(-50%, -50%);
-  width: 60px;
-  height: 60px;
+  width: 50px;
+  height: 50px;
   z-index: 15;
   background-color: rgba(0, 0, 0, 0.2);
   color: white;
@@ -524,6 +524,38 @@ document.querySelectorAll(".clickable").forEach((button) => {
     introVideo.addEventListener("error", (e) => {
       console.error("Video error:", e);
     });
+   
+   document.addEventListener("DOMContentLoaded", () => {
+  const introVideo = document.getElementById("intro-video");
+  const playButton = document.getElementById("play-button");
+
+  // Prevent autoplay before user clicks the button
+  introVideo.pause();
+  introVideo.currentTime = 0;
+  introVideo.muted = true; // Keep muted until user interacts
+
+  playButton.addEventListener("click", () => {
+    playButton.style.display = "none"; // Hide button after clicking
+    introVideo.muted = false; // Unmute video after interaction
+    introVideo.removeAttribute("muted"); // Ensure browsers recognize change
+    introVideo.currentTime = 0; // Restart from beginning
+
+    introVideo.play().then(() => {
+      console.log("Intro video started.");
+    }).catch((error) => {
+      console.error("Playback Error:", error);
+    });
+  });
+
+  // Handle iOS autoplay issues by ensuring a user interaction
+  document.body.addEventListener("touchstart", () => {
+    if (introVideo.paused) {
+      introVideo.play().catch((e) => console.error("iOS Touch Play Error:", e));
+    }
+  }, { once: true }); // Runs only once
+
+});
+
 
   </script>
 
