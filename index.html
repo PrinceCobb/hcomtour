@@ -177,12 +177,13 @@ const allVideos = [
   fifthVideo, sixthVideo, sevVideo, eigVideo, nineVideo
 ]; 
    
-   document.addEventListener("DOMContentLoaded", () => {
-  const introVideo = document.getElementById("intro-video");
-  introVideo.pause();
-  introVideo.currentTime = 0; 
-  introVideo.muted = true; // Keep muted until user interaction
-});
+// Prevent video from playing automatically
+    document.addEventListener("DOMContentLoaded", () => {
+      introVideo.pause();
+      introVideo.currentTime = 0; 
+      introVideo.muted = true;
+      console.log("Intro video is blocked from autoplay.");
+    });
 
    // Hide controls initially
 playPauseButton.style.display = "none";
@@ -309,46 +310,54 @@ document.addEventListener("DOMContentLoaded", () => {
 //  Disable cursor interactions at the start
 cursor.setAttribute("raycaster", "objects: none");
 
-//  Play Experience Button
-playButton.addEventListener("click", () => {
-  playButton.style.display = "none"; // Hide the Start button
-  scene.style.visibility = "visible"; // Show A-Frame scene
-  skipButton.style.display = "block"; // Show Skip button
+// Play Experience Button Click Event
+    playButton.addEventListener("click", () => {
+      playButton.style.display = "none"; // Hide Start Experience button
+      scene.style.visibility = "visible"; // Show A-Frame scene
+      skipButton.style.display = "block"; // Show Skip button
 
-  // Ensure intro video starts only after clicking the button
-  introVideo.muted = false;
-  introVideo.currentTime = 0; // Start from the beginning
+      // Load the video source only when the user clicks
+      const hlsUrl = "https://m2qall8jajdg-hls-push.5centscdn.com/mp4/comp/intro-test.mp4/playlist.m3u8";
 
-  introVideo.play().then(() => {
-    console.log("Intro video started with sound.");
-  }).catch((error) => {
-    console.error("Playback Error:", error);
-  });
-});
+      if (Hls.isSupported()) {
+        const hls = new Hls();
+        hls.loadSource(hlsUrl);
+        hls.attachMedia(introVideo);
+        hls.on(Hls.Events.MANIFEST_PARSED, () => {
+          console.log("HLS manifest loaded; ready to play intro video.");
+        });
+      } else if (introVideo.canPlayType("application/vnd.apple.mpegurl")) {
+        introVideo.src = hlsUrl;
+      } else {
+        console.error("HLS not supported on this browser.");
+      }
 
-   
-   // Skip Intro Functionality
-skipButton.addEventListener("click", () => {
-  if (introVideo.readyState >= 3) { // Ensure the video is loaded
-    introVideo.currentTime = introVideo.duration - 2; // Jump to last 2 seconds
-    introVideo.play();
-    
-    // Show menu immediately
-    menu.setAttribute("visible", true);
-    menu.classList.remove("hidden");
+      introVideo.muted = false; // Unmute after interaction
+      introVideo.currentTime = 0; // Start from beginning
+      introVideo.play().then(() => {
+        console.log("Intro video started.");
+      }).catch((error) => {
+        console.error("Playback Error:", error);
+      });
 
-    // Enable cursor interactions for menu
-    cursor.setAttribute("raycaster", "objects: .clickable");
+      // Set video to A-Frame videosphere
+      videoSphere.setAttribute("src", "#intro-video");
+    });
 
-    console.log("Intro skipped, menu displayed.");
-  } else {
-    console.error("Intro video is not ready yet.");
-  }
-  
-  // Hide both buttons after skipping
-  playButton.style.display = "none";
-  skipButton.style.display = "none";
-});
+    // Skip Intro Functionality
+    skipButton.addEventListener("click", () => {
+      if (introVideo.readyState >= 3) {
+        introVideo.currentTime = introVideo.duration - 2;
+        introVideo.play();
+        console.log("Intro skipped.");
+      } else {
+        console.error("Intro video is not ready.");
+      }
+
+      // Hide buttons after skipping
+      playButton.style.display = "none";
+      skipButton.style.display = "none";
+    });
    
 //  Store last timestamp for `intro-video`
 let introVideoPauseTime = 0;
