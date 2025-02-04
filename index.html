@@ -38,20 +38,13 @@
   width: 100px; 
   height: 40px;
   z-index: 10;
-  background-color: #D3D3D3; 
-  color: #006A4B;
-  border: none;
-  border-radius: 5px;
-  font-size: 18px;
-  font-weight: 500;
-  font-family: 'Barlow', sans-serif;
   cursor: pointer;
-}
+} 
   </style>
 </head>
 <body>
   <button id="play-button">Start Experience</button>
-  <button id="skip-button">Skip Intro</button>
+  <img id="skip-button" src="https://m2qall8jajdg-hls-push.5centscdn.com/btn/skipintro.png"</> 
   <a-scene id="scene" loading-screen="enabled:false">
     <a-assets>
       <video id="intro-video" crossorigin="anonymous" playsinline muted preload="metadata"></video>
@@ -232,7 +225,7 @@ function switchVideo(videoId) {
   menu.setAttribute("visible", false);
   menu.classList.add("hidden");
 
-  homebtn.setAttribute("visible", true);
+  homebtn.setAttribute("visible", false);
   homebtn.classList.add("hidden"); 
 
   //  Disable cursor interactions until the home button appears
