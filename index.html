@@ -66,12 +66,45 @@
   display: none;
 }
 
+  #video-controls {
+  position: absolute;
+  bottom: 50px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 80%;
+  display: none; /* Hide initially */
+  align-items: center;
+  justify-content: center;
+  z-index: 20;
+}
+
+#video-timeline {
+  width: 100%;
+  height: 8px;
+  background: #ddd;
+  border-radius: 5px;
+  appearance: none;
+  cursor: pointer;
+}
+
+#video-timeline::-webkit-slider-thumb {
+  appearance: none;
+  width: 14px;
+  height: 14px;
+  background: #006a4b;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
   </style>
 </head>
 <body>
   <button id="play-button">Start Experience</button>
   <img id="skip-button" src="https://m2qall8jajdg-hls-push.5centscdn.com/btn/skipintro.png"/>
   <button id="play-pause-button">▶</button>
+  <div id="video-controls">
+  <input type="range" id="video-timeline" min="0" value="0" step="0.1"></div>
+
   <a-scene id="scene" loading-screen="enabled:false">
     <a-assets>
       <video id="intro-video" crossorigin="anonymous" playsinline muted preload="metadata"></video>
@@ -136,6 +169,8 @@ const homebtn = document.getElementById("home");
 const cursor = document.querySelector("a-cursor");
 const skipButton = document.getElementById("skip-button");
 const playPauseButton = document.getElementById("play-pause-button");
+const videoTimeline = document.getElementById("video-timeline");
+const videoControls = document.getElementById("video-controls");
 
 const allVideos = [
   introVideo, secVideo, thirdVideo, fourthVideo,
@@ -188,7 +223,40 @@ allVideos.forEach((video) => {
     playPauseButton.style.display = "none"; // Hide button when video ends
   });
 });
+   
+   // Function to update the timeline as video plays
+function updateTimeline() {
+  const currentVideo = getCurrentPlayingVideo();
+  if (currentVideo && currentVideo.duration) {
+    videoTimeline.max = currentVideo.duration;
+    videoTimeline.value = currentVideo.currentTime;
+  }
+}
 
+// Function to seek video when user interacts with timeline
+videoTimeline.addEventListener("input", () => {
+  const currentVideo = getCurrentPlayingVideo();
+  if (currentVideo) {
+    currentVideo.currentTime = videoTimeline.value;
+  }
+});
+
+// Show timeline when a video starts playing
+allVideos.forEach((video) => {
+  video.addEventListener("play", () => {
+    videoControls.style.display = "flex"; // Show timeline
+  });
+
+  video.addEventListener("timeupdate", updateTimeline);
+
+  video.addEventListener("pause", () => {
+    videoControls.style.display = "flex"; // Keep timeline visible
+  });
+
+  video.addEventListener("ended", () => {
+    videoControls.style.display = "none"; // Hide timeline when video ends
+  });
+});
    
    // Ensure video does not autoplay on page load
 introVideo.pause();
