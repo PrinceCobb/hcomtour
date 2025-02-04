@@ -19,6 +19,8 @@
       border: none;
       border-radius: 5px;
       font-size: 18px;
+      font-weight: 500;
+      font-family: 'Barlow', sans-serif;
       cursor: pointer;
     }
     .hidden {
@@ -28,10 +30,28 @@
     .clickable {
       pointer-events: auto; /* Enable clicks for clickable items */
     }
+    
+    #skip-button {
+  position: absolute;
+  top: calc(48% + 350px - 25px);
+  left: calc(38% + 50px);
+  width: 100px; 
+  height: 40px;
+  z-index: 10;
+  background-color: #D3D3D3; 
+  color: #006A4B;
+  border: none;
+  border-radius: 5px;
+  font-size: 18px;
+  font-weight: 500;
+  font-family: 'Barlow', sans-serif;
+  cursor: pointer;
+}
   </style>
 </head>
 <body>
   <button id="play-button">Start Experience</button>
+  <button id="skip-button">Skip Intro</button>
   <a-scene id="scene" loading-screen="enabled:false">
     <a-assets>
       <video id="intro-video" crossorigin="anonymous" playsinline muted preload="metadata"></video>
@@ -70,7 +90,7 @@
       <a-image src="#fitness-normal" width="1.5" height="0.39" position="1.5 0.25 -5" class="clickable" id="fitness"></a-image>
       <a-image src="#admin-normal" width="1.5" height="0.39" position="1.5 -0.25 -5" class="clickable" id="admin"></a-image>
     </a-entity>
-    <a-entity id="home" position="-0.382 -1 -5" class="hidden" visible="false">
+    <a-entity id="home" position="-0.382 0.27 -5" class="hidden" visible="false">
       <a-image src="#homebtn" width="1.5" height="0.39" position="-0.234 0 0.01" class="clickable" id="homebtn"></a-image>
     </a-entity>
      <!-- <a-entity id="options" position="1.238 -1 -5" class="hidden" visible="false">
@@ -94,11 +114,17 @@ const menu = document.getElementById("menubtn");
 const videoSky = document.getElementById("video-sky");
 const homebtn = document.getElementById("home");
 const cursor = document.querySelector("a-cursor");
+const skipButton = document.getElementById("skip-button");
 
 const allVideos = [
   introVideo, secVideo, thirdVideo, fourthVideo,
   fifthVideo, sixthVideo, sevVideo, eigVideo, nineVideo
-];
+]; 
+   
+   // Ensure video does not autoplay on page load
+introVideo.pause();
+introVideo.currentTime = 0;
+introVideo.muted = true; // Keep muted until user interaction
 
 document.addEventListener("DOMContentLoaded", () => {
   const introVideo = document.getElementById("intro-video");
@@ -135,6 +161,30 @@ playButton.addEventListener("click", () => {
     console.log("Video playing with audio.");
   }).catch((e) => console.error("Playback Error:", e));
 });
+   
+   // Skip Intro Functionality
+skipButton.addEventListener("click", () => {
+  if (introVideo.readyState >= 3) { // Ensure the video is loaded
+    introVideo.currentTime = introVideo.duration - 2; // Jump to last 2 seconds
+    introVideo.play();
+    
+    // Show menu immediately
+    menu.setAttribute("visible", true);
+    menu.classList.remove("hidden");
+
+    // Enable cursor interactions for menu
+    cursor.setAttribute("raycaster", "objects: .clickable");
+
+    console.log("Intro skipped, menu displayed.");
+  } else {
+    console.error("Intro video is not ready yet.");
+  }
+  
+  // Hide both buttons after skipping
+  playButton.style.display = "none";
+  skipButton.style.display = "none";
+});
+   
 //  Store last timestamp for `intro-video`
 let introVideoPauseTime = 0;
 
@@ -182,8 +232,8 @@ function switchVideo(videoId) {
   menu.setAttribute("visible", false);
   menu.classList.add("hidden");
 
-  homebtn.setAttribute("visible", false);
-  homebtn.classList.add("hidden");
+  homebtn.setAttribute("visible", true);
+  homebtn.classList.add("hidden"); 
 
   //  Disable cursor interactions until the home button appears
   cursor.setAttribute("raycaster", "objects: none");
@@ -214,7 +264,7 @@ document.getElementById("home").addEventListener("click", () => {
 
 //  Track when intro video reaches the menu moment
 introVideo.addEventListener("timeupdate", () => {
-  if (introVideo.duration - introVideo.currentTime <= 4) {
+  if (introVideo.duration - introVideo.currentTime <= 8) {
     introVideoPauseTime = introVideo.currentTime; // Save the timestamp
   }
 });
