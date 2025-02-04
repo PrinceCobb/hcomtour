@@ -106,7 +106,7 @@
 
   <a-scene id="scene" loading-screen="enabled:false">
     <a-assets>
-      <video id="intro-video" crossorigin="anonymous" playsinline preload="none"></video>  
+      <video id="intro-video" crossorigin="anonymous" playsinline preload="none"></video> 
       <!-- <video id="intro-video" src="introx2.mp4" crossorigin="anonymous" playsinline muted preload="auto"></video> -->
       <!-- <video id="intro-video" src="http://m2qall8jajdg-hls-push.5centscdn.com/mp4/webm/intro.mp4" crossorigin="anonymous" playsinline muted preload="auto"></video> -->
       <video id="scene-two-video" src="https://m2qall8jajdg-hls-push.5centscdn.com/mp4/comp/OMM.mp4" crossorigin="anonymous" playsinline muted preload="auto"></video>
@@ -277,31 +277,34 @@ document.addEventListener("DOMContentLoaded", () => {
   const introVideo = document.getElementById("intro-video");
   const hlsUrl = 'https://m2qall8jajdg-hls-push.5centscdn.com/mp4/comp/intro-test.mp4/playlist.m3u8';
 
-  if (Hls.isSupported()) {
-    const hls = new Hls();
-    hls.loadSource(hlsUrl);
-    hls.attachMedia(introVideo);
-    hls.on(Hls.Events.MANIFEST_PARSED, () => {
-      console.log("HLS manifest loaded; ready to play intro video.");
-    });
-  } else if (introVideo.canPlayType('application/vnd.apple.mpegurl')) {
-    introVideo.src = hlsUrl;
-  } else {
-    console.error("HLS not supported on this device/browser.");
-  }
-  
-  // Show menu 8 seconds before the intro video ends
-  introVideo.addEventListener("timeupdate", () => {
-    if (introVideo.duration - introVideo.currentTime <= 5) {
-      menu.setAttribute("visible", true);
-      menu.classList.remove("hidden");
- 
-      // Enable cursor interactions for menu
-      cursor.setAttribute("raycaster", "objects: .clickable");
- 
-      console.log("Menu displayed 5 seconds before the intro video ends.");
+  //Stop browser from preloading or playing video 
+  introVideo.pause();
+  introVideo.currentTime = 0; // Ensure it starts at 0
+  introVideo.removeAttribute("src"); // Prevents loading automatically
+
+  playButton.addEventListener("click", () => {
+    playButton.style.display = "none"; // Hide Start Experience button
+    scene.style.visibility = "visible"; // Show A-Frame scene
+    skipButton.style.display = "block"; // Show Skip button
+
+    // 🚀 Load HLS ONLY when the user clicks "Start Experience"
+    if (Hls.isSupported()) {
+      const hls = new Hls();
+      hls.loadSource(hlsUrl);
+      hls.attachMedia(introVideo);
+      hls.on(Hls.Events.MANIFEST_PARSED, () => {
+        console.log("HLS manifest loaded, ready to play intro video.");
+        introVideo.muted = false; // Ensure it's not muted
+        introVideo.play().catch((e) => console.error("Playback Error:", e));
+      });
+    } else if (introVideo.canPlayType("application/vnd.apple.mpegurl")) {
+      introVideo.src = hlsUrl;
+      introVideo.muted = false;
+      introVideo.play().catch((e) => console.error("Playback Error:", e));
+    } else {
+      console.error("HLS not supported on this browser.");
     }
-  }); 
+  });
 });
    
 
