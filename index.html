@@ -53,7 +53,7 @@
   background-color: rgba(0, 0, 0, 0.2);
   color: white;
   border: none;
-  border-radius: 50%;
+  border-radius: 100%;
   font-size: 30px;
   font-weight: bold;
   cursor: pointer;
@@ -65,7 +65,7 @@
 .hidden {
   display: none;
 }
-
+ 
   #video-controls {
   position: absolute;
   bottom: 50px;
@@ -176,7 +176,10 @@ const allVideos = [
   introVideo, secVideo, thirdVideo, fourthVideo,
   fifthVideo, sixthVideo, sevVideo, eigVideo, nineVideo
 ]; 
-   
+   // Hide controls initially
+playPauseButton.style.display = "none";
+videoControls.style.display = "none";
+
    let lastPlayedVideo = null; // Track the last played video
 
 // Function to get the currently playing video
@@ -300,21 +303,26 @@ cursor.setAttribute("raycaster", "objects: none");
 
 //  Play Experience Button
 playButton.addEventListener("click", () => {
-  playButton.style.display = "none"; // Hide Start Experience button
+  playButton.style.display = "none"; // Hide Start Experience button  
   scene.style.visibility = "visible"; // Show the A-Frame scene
   skipButton.style.display = "block"; // Show Skip button
-
+  
   // Ensure video starts from the beginning and unmuted
   introVideo.muted = false;
   introVideo.removeAttribute("muted"); // Ensures browsers allow sound
   introVideo.currentTime = 0;
-
   introVideo.play().then(() => {
     console.log("Intro video started with sound.");
+    
+    // 🔥 Show play/pause button & timeline ONLY after clicking "Start Experience"
+    playPauseButton.style.display = "flex";
+    videoControls.style.display = "flex"; 
+
   }).catch((error) => {
     console.error("Playback Error:", error);
   });
 });
+
    
    // Skip Intro Functionality
 skipButton.addEventListener("click", () => {
