@@ -244,7 +244,7 @@ function updateTimeline() {
 }
 
 // Function to seek video when user interacts with timeline
-videoTimeline.addEventListener("input", () => {
+videoTimeline.addEventListener("change", () => {
   const currentVideo = getCurrentPlayingVideo();
   if (currentVideo) {
     currentVideo.currentTime = videoTimeline.value;
@@ -342,7 +342,9 @@ cursor.setAttribute("raycaster", "objects: none");
       console.log("Intro video loaded but still paused.");
 
       // Set video to A-Frame videosphere
-      videoSphere.setAttribute("src", "#intro-video");
+      const videoSphere = document.getElementById("video-sky");
+      videoSphere.setAttribute("src", "#intro-video"); 
+
 
       // Explicitly start video
       introVideo.play().then(() => {
@@ -373,29 +375,19 @@ let introVideoPauseTime = 0;
 // Handle Video End Logic
 function handleVideoEnd(video) {
   video.addEventListener("ended", () => {
-    console.log(`Video ${video.id} ended.`);
-
     if (video.id === "intro-video") {
-      //  Show menu only after intro video
       menu.setAttribute("visible", true);
       menu.classList.remove("hidden");
-
-      //  Enable cursor interactions for menu
       cursor.setAttribute("raycaster", "objects: .clickable");
     } else {
-      //  Hide menu for other videos
-      menu.setAttribute("visible", false);
       menu.classList.add("hidden");
-
-      //  Show home button at the end of other videos
       homebtn.setAttribute("visible", true);
       homebtn.classList.remove("hidden");
-
-      //  Enable cursor interactions only when `homebtn` appears
       cursor.setAttribute("raycaster", "objects: .clickable");
     }
   });
 }
+
 
 // Attach event listener to each video
 allVideos.forEach(handleVideoEnd);
@@ -429,28 +421,42 @@ function switchVideo(videoId) {
 }
 
 //  Home Button Click: Return to Intro Video & Show Menu
-document.getElementById("home").addEventListener("click", () => {
-  switchVideo("intro-video");
+homebtn.addEventListener("click", () => {
+    console.log("🏠 Home button clicked. Returning to Intro Video...");
 
-  //  Resume intro video from where the menu appears (approx. last 4 seconds)
-  introVideo.currentTime = introVideoPauseTime || (introVideo.duration - 4);
-  introVideo.pause(); // Pause it so menu is visible immediately
-  console.log(`Returning to intro video at ${introVideo.currentTime} seconds.`);
+    // Pause any playing videos and reset the scene to intro video
+    introVideo.pause();
+    introVideo.load();
+    videoSky.setAttribute("src", "#intro-video");
 
-  //  Show the menu immediately when home button is clicked
-  menu.setAttribute("visible", true);
-  menu.classList.remove("hidden");
+    function seekAndPauseIntro() {
+        if (!isNaN(introVideo.duration) && introVideo.duration > 4) {
+            introVideo.currentTime = introVideo.duration - 4; // Seek to last 4 seconds
+            introVideo.pause();
+            console.log(`✅ Intro Video Paused at ${introVideo.currentTime.toFixed(2)}s`);
+        } else {
+            console.warn("⏳ Waiting for metadata...");
+        }
+    }
 
-  //  Enable cursor interactions when returning to intro video
-  cursor.setAttribute("raycaster", "objects: .clickable");
+    if (introVideo.readyState >= 2) {
+        seekAndPauseIntro();
+    } else {
+        introVideo.addEventListener("loadedmetadata", seekAndPauseIntro, { once: true });
+    }
+
+    // 🔥 Hide the home button completely (Both A-Frame & CSS)
+    homebtn.setAttribute("visible", false);  // A-Frame method
+    homebtn.classList.add("hidden");         // Hide using CSS
+    homebtn.style.display = "none";          // Ensure it doesn’t show again
+
+    // Show menu again
+    menu.setAttribute("visible", true);
+    menu.classList.remove("hidden");
+
+    console.log("🏠 Successfully switched back to the Intro Video, home button removed.");
 });
 
-//  Track when intro video reaches the menu moment
-introVideo.addEventListener("timeupdate", () => {
-  if (introVideo.duration - introVideo.currentTime <= 8) {
-    introVideoPauseTime = introVideo.currentTime; // Save the timestamp
-  }
-});
 
 // Click Events for Switching Videos
 document.getElementById("ommlab").addEventListener("click", () => switchVideo("scene-two-video"));
