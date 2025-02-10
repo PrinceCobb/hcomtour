@@ -31,18 +31,18 @@
     .clickable { pointer-events: auto; }
     
   #skip-button {
-  position: absolute;
-  top: calc(48% + 350px - 25px);
-  left: calc(80% - 10px - 45px);
+  position: relative;
+  top: calc(48% + 380px - 25px);
+  left: calc(88% - 10px - 45px);
   width: 70px; 
   height: 30px;
   z-index: 10;
   cursor: pointer;
   display: none; /* Hide initially */
-} 
+}  
     
   #play-pause-button {
-  position: absolute;
+  position: relative;
   top: calc(50% + 330px);
   left: 12%;
   transform: translate(-50%, -50%);
@@ -50,7 +50,7 @@
   height: 50px;
   z-index: 15;
   background-color: rgba(0, 0, 0, 0.0); 
-  color: white;
+  color: white; 
   border: none;
   border-radius: 50%;
   font-size: 30px;
@@ -66,7 +66,7 @@
 }
  
   #video-controls {
-  position: relative;
+  position: absolute;
   bottom: 50px;
   left: 50%;
   transform: translateX(-50%);
