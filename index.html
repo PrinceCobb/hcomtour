@@ -30,15 +30,13 @@
     .hidden { display: none; pointer-events: none; }
     .clickable { pointer-events: auto; }
     
- 
-/* Default: Bottom-centered for portrait mode */
-/* Default: Bottom-centered for portrait mode */
+  /* Fixed Frame for Controls */
 #control-frame {
   position: fixed;
   bottom: 20px;
   left: 50%;
   transform: translateX(-50%);
-  width: 360px;
+  width: 360px; /* Ensure it doesn't move around */
   height: 100px;
   display: flex;
   align-items: center;
@@ -47,33 +45,8 @@
   padding: 10px;
   border-radius: 10px;
   z-index: 999;
-  transition: all 0.3s ease-in-out;
 }
 
-/* Landscape Mode (Mobile Only) */
-@media screen and (max-width: 768px) and (orientation: landscape) {
-  #control-frame {
-    top: 10px; /* Move to the top */
-    left: auto;
-    right: 10px; /* Move to the right */
-    transform: none;
-    width: auto; /* Fit content */
-    height: 60px;
-    flex-direction: row; /* Keep horizontal */
-  }
-
-  #video-controls {
-    flex-direction: row;
-    width: auto;
-  }
-
-  #video-timeline {
-    transform: none; /* Keep horizontal */
-    width: 150px; /* Reduce size slightly */
-  }
-}
-
-    
 /* Play/Pause Button */
 #play-pause-button {
   width: 50px;
@@ -641,67 +614,6 @@ document.querySelectorAll(".clickable").forEach((button) => {
   }, { once: true }); // Runs only once
 
 });
-
-   function adjustControlsForOrientation() {
-  const controlFrame = document.getElementById("control-frame");
-  const videoControls = document.getElementById("video-controls");
-  const videoTimeline = document.getElementById("video-timeline");
-
-  // Detect mobile devices
-  if (window.matchMedia("(max-width: 768px)").matches) {
-    if (window.innerWidth > window.innerHeight) {
-      // Landscape Mode: Move to Right
-      controlFrame.style.position = "fixed";
-      controlFrame.style.top = "10px";
-      controlFrame.style.bottom = "auto";
-      controlFrame.style.left = "auto";
-      controlFrame.style.right = "10px";
-      controlFrame.style.transform = "none";
-      controlFrame.style.flexDirection = "row"; // Keep horizontal
-      controlFrame.style.width = "auto";
-      controlFrame.style.height = "60px";
-
-      videoControls.style.flexDirection = "row";
-      videoTimeline.style.transform = "none";
-      videoTimeline.style.width = "150px";
-    } else {
-      // Portrait Mode: Keep Bottom Centered
-      controlFrame.style.position = "fixed";
-      controlFrame.style.bottom = "20px";
-      controlFrame.style.top = "auto";
-      controlFrame.style.left = "50%";
-      controlFrame.style.right = "auto";
-      controlFrame.style.transform = "translateX(-50%)";
-      controlFrame.style.flexDirection = "row";
-      controlFrame.style.width = "360px";
-      controlFrame.style.height = "100px";
-
-      videoControls.style.flexDirection = "row";
-      videoTimeline.style.transform = "none";
-      videoTimeline.style.width = "100%";
-    }
-  } else {
-    // Desktop Mode (Keep default)
-    controlFrame.style.position = "fixed";
-    controlFrame.style.bottom = "20px";
-    controlFrame.style.left = "50%";
-    controlFrame.style.right = "auto";
-    controlFrame.style.top = "auto";
-    controlFrame.style.transform = "translateX(-50%)";
-    controlFrame.style.flexDirection = "row";
-    controlFrame.style.width = "360px";
-    controlFrame.style.height = "100px";
-    videoControls.style.flexDirection = "row";
-    videoTimeline.style.transform = "none";
-    videoTimeline.style.width = "100%";
-  }
-}
-
-// Detect screen resize or orientation change
-window.addEventListener("resize", () => {
-  setTimeout(adjustControlsForOrientation, 100);
-});
-window.addEventListener("DOMContentLoaded", adjustControlsForOrientation);
 
   </script>
 
