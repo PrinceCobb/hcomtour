@@ -31,12 +31,13 @@
     .clickable { pointer-events: auto; }
     
   /* Fixed Frame for Controls */
+/* Default: Bottom-centered for portrait mode */
 #control-frame {
   position: fixed;
   bottom: 20px;
   left: 50%;
   transform: translateX(-50%);
-  width: 360px; /* Ensures stable size */
+  width: 360px;
   height: 100px;
   display: flex;
   align-items: center;
@@ -45,32 +46,30 @@
   padding: 10px;
   border-radius: 10px;
   z-index: 999;
-  transition: all 0.3s
+  transition: all 0.3s ease-in-out;
 }
 
-    /* For Landscape Mode (mobile-only) */
+/* Landscape Mode (Mobile Only) */
 @media screen and (max-width: 768px) and (orientation: landscape) {
   #control-frame {
     bottom: auto;
-    top: 50%;
+    top: 10px;  /* Position near the top */
     left: auto;
-    right: 10px;
-    transform: translateY(-50%);
-    flex-direction: column;
-    width: 80px;
-    height: auto;
-    justify-content: center;
+    right: 10px; /* Shift to the right */
+    transform: none;
+    flex-direction: row; /* Keep controls horizontal */
+    width: auto; /* Adjust width to fit buttons */
+    height: 60px; /* Reduce height */
   }
 
   #video-controls {
-    flex-direction: column;
+    flex-direction: row;
     width: auto;
   }
 
   #video-timeline {
-    transform: rotate(90deg);
-    width: 120px;
-    margin: 10px 0;
+    transform: none; /* No rotation */
+    width: 150px; /* Slightly reduced for landscape mode */
   }
 }
     
@@ -664,20 +663,19 @@ document.querySelectorAll(".clickable").forEach((button) => {
       videoTimeline.style.transform = "none";
       videoTimeline.style.width = "100%";
     } else {
-      // Landscape Mode: Move to Right Sidebar
+      // Landscape Mode: Move to the Right Side, Keep Horizontal Layout
       controlFrame.style.position = "fixed";
       controlFrame.style.bottom = "auto";
-      controlFrame.style.top = "50%";
+      controlFrame.style.top = "10px";
       controlFrame.style.left = "auto";
       controlFrame.style.right = "10px";
-      controlFrame.style.transform = "translateY(-50%)";
-      controlFrame.style.flexDirection = "column";
-      controlFrame.style.width = "80px";
-      controlFrame.style.height = "auto";
-      videoControls.style.flexDirection = "column";
-      videoTimeline.style.transform = "rotate(90deg)";
-      videoTimeline.style.width = "120px";
-      videoTimeline.style.margin = "10px 0";
+      controlFrame.style.transform = "none";
+      controlFrame.style.flexDirection = "row"; // Keep controls horizontal
+      controlFrame.style.width = "auto";
+      controlFrame.style.height = "60px";
+      videoControls.style.flexDirection = "row";
+      videoTimeline.style.transform = "none"; // Keep horizontal
+      videoTimeline.style.width = "150px"; // Slightly reduced width for landscape mode
     }
   } else {
     // Desktop Mode (Keep default)
