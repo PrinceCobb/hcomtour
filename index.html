@@ -32,16 +32,16 @@
     
   /* Fixed Frame for Controls */
 #control-frame {
-  position: fixed; /* Keep the frame fixed on screen */
-  bottom: 20px; /* Stay at bottom */
+  position: fixed;
+  bottom: 20px;
   left: 50%;
   transform: translateX(-50%);
-  width: 320px; /* Fixed width */
-  height: 100px; /* Fixed height */
+  width: 360px; /* Ensure it doesn't move around */
+  height: 100px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: rgba(0, 0, 0, 0.0); /* Semi-transparent background */
+  background: rgba(0, 0, 0, 0.0);
   padding: 10px;
   border-radius: 10px;
   z-index: 999;
@@ -51,7 +51,7 @@
 #play-pause-button {
   width: 50px;
   height: 50px;
-  background-color: rgba(0, 0, 0, 0.2); 
+  background-color: rgba(0, 0, 0, 0.7);
   color: white;
   border: none;
   border-radius: 50%;
@@ -62,21 +62,17 @@
   justify-content: center;
 }
 
+/* Skip Intro Button */
 #skip-button {
   display: none; /* Hide initially */
-  position: fixed;
-  bottom: 150px; /* Position above video controls */
-  right: 10%;
   width: 100px;
   height: 40px;
-  z-index: 999;
   cursor: pointer;
 }
 
-
 /* Video Timeline */
 #video-controls {
-  width: 100%;
+  flex: 1;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -99,6 +95,7 @@
   border-radius: 50%;
   cursor: pointer;
 }
+
 
   </style>
 </head>
@@ -379,7 +376,7 @@ cursor.setAttribute("raycaster", "objects: none");
     playButton.style.display = "none"; // Hide Start Experience button
     skipButton.style.display = "block"; // Show Skip Intro button
   });
-
+ 
   // Skip Intro functionality
   skipButton.addEventListener("click", () => {
     const introVideo = document.getElementById("intro-video");
@@ -394,7 +391,6 @@ cursor.setAttribute("raycaster", "objects: none");
 
     // Hide Skip Intro button after skipping
     skipButton.style.display = "none";
-    playButton.style.display = "none";
   });
 });
    
