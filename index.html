@@ -31,13 +31,13 @@
     .clickable { pointer-events: auto; }
     
   /* Fixed Frame for Controls */
-#control-frame {
+#control-frame { 
   position: fixed;
-  bottom: 20px;
-  left: 50%;
+  bottom: 20px; /* Default position */
+  left: 50%; 
   transform: translateX(-50%);
-  width: 360px; /* Ensure it doesn't move around */
-  height: 100px;
+  width: 360px;
+  height: 100px; 
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -45,6 +45,16 @@
   padding: 10px;
   border-radius: 10px;
   z-index: 999;
+  transition: all 0.3s ease-in-out; /* Smooth transition */
+}
+
+#control-frame.landscape {
+  bottom: auto;
+  top: 50%;
+  left: auto;
+  right: 20px;
+  transform: translateY(-50%);
+  flex-direction: column; /* Stack buttons vertically */
 }
 
 /* Play/Pause Button */
@@ -614,6 +624,38 @@ document.querySelectorAll(".clickable").forEach((button) => {
   }, { once: true }); // Runs only once
 
 });
+   
+   document.addEventListener("DOMContentLoaded", () => {
+    const controlFrame = document.getElementById("control-frame");
+
+    function adjustControlsBasedOnOrientation() {
+        if (window.innerHeight > window.innerWidth) {
+            // Portrait Mode - Controls at the Bottom
+            controlFrame.style.bottom = "20px";
+            controlFrame.style.left = "50%";
+            controlFrame.style.top = "auto";
+            controlFrame.style.right = "auto";
+            controlFrame.style.transform = "translateX(-50%)";
+            controlFrame.style.flexDirection = "row"; // Keep controls horizontal
+        } else {
+            // Landscape Mode - Controls on the Right Side
+            controlFrame.style.bottom = "auto";
+            controlFrame.style.left = "auto";
+            controlFrame.style.top = "50%";
+            controlFrame.style.right = "20px";
+            controlFrame.style.transform = "translateY(-50%)";
+            controlFrame.style.flexDirection = "column"; // Stack controls vertically
+        }
+    }
+
+    // Initial check on page load
+    adjustControlsBasedOnOrientation();
+
+    // Listen for orientation changes
+    window.addEventListener("resize", adjustControlsBasedOnOrientation);
+    window.addEventListener("orientationchange", adjustControlsBasedOnOrientation);
+});
+
 
 
   </script>
