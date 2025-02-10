@@ -389,8 +389,14 @@ cursor.setAttribute("raycaster", "objects: none");
       console.error("Intro video is not ready.");
     }
 
-    // Hide Skip Intro button after skipping
+   // Hide Skip Intro button immediately after skipping
     skipButton.style.display = "none";
+  });
+
+  // **Ensure Skip Button Disappears When Intro Video Ends**
+  introVideo.addEventListener("ended", () => {
+    skipButton.style.display = "none"; // Hide Skip button on video end
+    console.log("Intro video ended, hiding Skip button.");
   });
 });
    
