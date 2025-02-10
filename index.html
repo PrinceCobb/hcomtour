@@ -51,7 +51,7 @@
 #play-pause-button {
   width: 50px;
   height: 50px;
-  background-color: rgba(0, 0, 0, 0.7);
+  background-color: rgba(0, 0, 0, 0.2); 
   color: white;
   border: none;
   border-radius: 50%;
@@ -62,12 +62,17 @@
   justify-content: center;
 }
 
-/* Skip Button */
 #skip-button {
-  width: 90px;
+  display: none; /* Hide initially */
+  position: fixed;
+  bottom: 150px; /* Position above video controls */
+  right: 10%;
+  width: 100px;
   height: 40px;
+  z-index: 999;
   cursor: pointer;
 }
+
 
 /* Video Timeline */
 #video-controls {
@@ -362,20 +367,36 @@ cursor.setAttribute("raycaster", "objects: none");
       });
     });
 
-    // Skip Intro Functionality
-    skipButton.addEventListener("click", () => {
-      if (introVideo.readyState >= 3) {
-        introVideo.currentTime = introVideo.duration - 2;
-        introVideo.play();
-        console.log("Intro skipped.");
-      } else {
-        console.error("Intro video is not ready.");
-      }
+    document.addEventListener("DOMContentLoaded", () => {
+  const playButton = document.getElementById("play-button");
+  const skipButton = document.getElementById("skip-button");
 
-      // Hide buttons after skipping
-      playButton.style.display = "none";
-      skipButton.style.display = "none";
-    });
+  // Initially hide Skip Intro button
+  skipButton.style.display = "none";
+
+  // Show Skip Intro button only when Start Experience is clicked
+  playButton.addEventListener("click", () => {
+    playButton.style.display = "none"; // Hide Start Experience button
+    skipButton.style.display = "block"; // Show Skip Intro button
+  });
+
+  // Skip Intro functionality
+  skipButton.addEventListener("click", () => {
+    const introVideo = document.getElementById("intro-video");
+
+    if (introVideo.readyState >= 3) {
+      introVideo.currentTime = introVideo.duration - 2;
+      introVideo.play();
+      console.log("Intro skipped.");
+    } else {
+      console.error("Intro video is not ready.");
+    }
+
+    // Hide Skip Intro button after skipping
+    skipButton.style.display = "none";
+    playButton.style.display = "none";
+  });
+});
    
 //  Store last timestamp for `intro-video`
 let introVideoPauseTime = 0;
