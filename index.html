@@ -617,26 +617,27 @@ document.querySelectorAll(".clickable").forEach((button) => {
   });
 
   // Handle iOS autoplay issues by ensuring a user interaction
-  document.body.addEventListener("touchstart", () => {
-    if (introVideo.paused) {
-      introVideo.play().catch((e) => console.error("iOS Touch Play Error:", e));
-    }
-  }, { once: true }); // Runs only once
-
-});
-   
-   document.addEventListener("DOMContentLoaded", () => {
+ document.addEventListener("DOMContentLoaded", () => {
     const controlFrame = document.getElementById("control-frame");
 
     function adjustControlsBasedOnOrientation() {
-        if (window.matchMedia("(orientation: portrait)").matches) {
+        let isPortrait = window.matchMedia("(orientation: portrait)").matches;
+
+        // Ensure older browsers and iOS devices detect orientation correctly
+        if (screen.orientation) {
+            isPortrait = screen.orientation.type.includes("portrait");
+        } else if (typeof window.orientation !== "undefined") {
+            isPortrait = window.orientation === 0 || window.orientation === 180;
+        }
+
+        if (isPortrait) {
             // Portrait Mode - Controls at the Bottom
             controlFrame.style.bottom = "20px";
             controlFrame.style.left = "50%";
             controlFrame.style.top = "auto";
             controlFrame.style.right = "auto";
             controlFrame.style.transform = "translateX(-50%)";
-            controlFrame.style.flexDirection = "row"; // Keep controls horizontal
+            controlFrame.style.flexDirection = "row"; // Keep horizontal
         } else {
             // Landscape Mode - Controls on the Right Side
             controlFrame.style.bottom = "auto";
@@ -644,20 +645,23 @@ document.querySelectorAll(".clickable").forEach((button) => {
             controlFrame.style.top = "50%";
             controlFrame.style.right = "20px";
             controlFrame.style.transform = "translateY(-50%)";
-            controlFrame.style.flexDirection = "column"; // Stack controls vertically
+            controlFrame.style.flexDirection = "column"; // Stack vertically
         }
     }
 
     // Initial check when the page loads
     adjustControlsBasedOnOrientation();
 
-    // Detect orientation change properly
+    // Listen for proper orientation change across all devices
     window.addEventListener("resize", () => {
-        setTimeout(adjustControlsBasedOnOrientation, 200); // Small delay for mobile smoothness
+        setTimeout(adjustControlsBasedOnOrientation, 150); // Small delay for mobile smoothness
     });
 
-    window.matchMedia("(orientation: portrait)").addEventListener("change", adjustControlsBasedOnOrientation);
-    window.matchMedia("(orientation: landscape)").addEventListener("change", adjustControlsBasedOnOrientation);
+    if (screen.orientation) {
+        screen.orientation.addEventListener("change", adjustControlsBasedOnOrientation);
+    } else {
+        window.addEventListener("orientationchange", adjustControlsBasedOnOrientation);
+    }
 });
 
   </script>
