@@ -30,7 +30,8 @@
     .hidden { display: none; pointer-events: none; }
     .clickable { pointer-events: auto; }
     
-  /* Fixed Frame for Controls */
+ 
+/* Default: Bottom-centered for portrait mode */
 /* Default: Bottom-centered for portrait mode */
 #control-frame {
   position: fixed;
@@ -52,14 +53,13 @@
 /* Landscape Mode (Mobile Only) */
 @media screen and (max-width: 768px) and (orientation: landscape) {
   #control-frame {
-    bottom: auto;
-    top: 10px;  /* Position near the top */
+    top: 10px; /* Move to the top */
     left: auto;
-    right: 10px; /* Shift to the right */
+    right: 10px; /* Move to the right */
     transform: none;
-    flex-direction: row; /* Keep controls horizontal */
-    width: auto; /* Adjust width to fit buttons */
-    height: 60px; /* Reduce height */
+    width: auto; /* Fit content */
+    height: 60px;
+    flex-direction: row; /* Keep horizontal */
   }
 
   #video-controls {
@@ -68,10 +68,11 @@
   }
 
   #video-timeline {
-    transform: none; /* No rotation */
-    width: 150px; /* Slightly reduced for landscape mode */
+    transform: none; /* Keep horizontal */
+    width: 150px; /* Reduce size slightly */
   }
 }
+
     
 /* Play/Pause Button */
 #play-pause-button {
@@ -646,10 +647,25 @@ document.querySelectorAll(".clickable").forEach((button) => {
   const videoControls = document.getElementById("video-controls");
   const videoTimeline = document.getElementById("video-timeline");
 
+  // Detect mobile devices
   if (window.matchMedia("(max-width: 768px)").matches) {
-    // Mobile Device Detected
-    if (window.matchMedia("(orientation: portrait)").matches) {
-      // Portrait Mode: Bottom-centered
+    if (window.innerWidth > window.innerHeight) {
+      // Landscape Mode: Move to Right
+      controlFrame.style.position = "fixed";
+      controlFrame.style.top = "10px";
+      controlFrame.style.bottom = "auto";
+      controlFrame.style.left = "auto";
+      controlFrame.style.right = "10px";
+      controlFrame.style.transform = "none";
+      controlFrame.style.flexDirection = "row"; // Keep horizontal
+      controlFrame.style.width = "auto";
+      controlFrame.style.height = "60px";
+
+      videoControls.style.flexDirection = "row";
+      videoTimeline.style.transform = "none";
+      videoTimeline.style.width = "150px";
+    } else {
+      // Portrait Mode: Keep Bottom Centered
       controlFrame.style.position = "fixed";
       controlFrame.style.bottom = "20px";
       controlFrame.style.top = "auto";
@@ -659,23 +675,10 @@ document.querySelectorAll(".clickable").forEach((button) => {
       controlFrame.style.flexDirection = "row";
       controlFrame.style.width = "360px";
       controlFrame.style.height = "100px";
+
       videoControls.style.flexDirection = "row";
       videoTimeline.style.transform = "none";
       videoTimeline.style.width = "100%";
-    } else {
-      // Landscape Mode: Move to the Right Side, Keep Horizontal Layout
-      controlFrame.style.position = "fixed";
-      controlFrame.style.bottom = "auto";
-      controlFrame.style.top = "10px";
-      controlFrame.style.left = "auto";
-      controlFrame.style.right = "10px";
-      controlFrame.style.transform = "none";
-      controlFrame.style.flexDirection = "row"; // Keep controls horizontal
-      controlFrame.style.width = "auto";
-      controlFrame.style.height = "60px";
-      videoControls.style.flexDirection = "row";
-      videoTimeline.style.transform = "none"; // Keep horizontal
-      videoTimeline.style.width = "150px"; // Slightly reduced width for landscape mode
     }
   } else {
     // Desktop Mode (Keep default)
@@ -694,13 +697,11 @@ document.querySelectorAll(".clickable").forEach((button) => {
   }
 }
 
-// Detect orientation change and apply styles
-window.addEventListener("orientationchange", adjustControlsForOrientation);
-window.addEventListener("resize", adjustControlsForOrientation);
-
-// Run on page load
-document.addEventListener("DOMContentLoaded", adjustControlsForOrientation);
-
+// Detect screen resize or orientation change
+window.addEventListener("resize", () => {
+  setTimeout(adjustControlsForOrientation, 100);
+});
+window.addEventListener("DOMContentLoaded", adjustControlsForOrientation);
 
   </script>
 
