@@ -629,7 +629,7 @@ document.querySelectorAll(".clickable").forEach((button) => {
     const controlFrame = document.getElementById("control-frame");
 
     function adjustControlsBasedOnOrientation() {
-        if (window.innerHeight > window.innerWidth) {
+        if (window.matchMedia("(orientation: portrait)").matches) {
             // Portrait Mode - Controls at the Bottom
             controlFrame.style.bottom = "20px";
             controlFrame.style.left = "50%";
@@ -648,15 +648,17 @@ document.querySelectorAll(".clickable").forEach((button) => {
         }
     }
 
-    // Initial check on page load
+    // Initial check when the page loads
     adjustControlsBasedOnOrientation();
 
-    // Listen for orientation changes
-    window.addEventListener("resize", adjustControlsBasedOnOrientation);
-    window.addEventListener("orientationchange", adjustControlsBasedOnOrientation);
+    // Detect orientation change properly
+    window.addEventListener("resize", () => {
+        setTimeout(adjustControlsBasedOnOrientation, 200); // Small delay for mobile smoothness
+    });
+
+    window.matchMedia("(orientation: portrait)").addEventListener("change", adjustControlsBasedOnOrientation);
+    window.matchMedia("(orientation: landscape)").addEventListener("change", adjustControlsBasedOnOrientation);
 });
-
-
 
   </script>
 
