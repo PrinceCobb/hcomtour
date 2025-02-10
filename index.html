@@ -623,44 +623,53 @@ document.querySelectorAll(".clickable").forEach((button) => {
     function adjustControlsBasedOnOrientation() {
         let isPortrait = window.matchMedia("(orientation: portrait)").matches;
 
-        // Ensure older browsers and iOS devices detect orientation correctly
+        // Ensure backward compatibility with older browsers (iOS & Android)
         if (screen.orientation) {
-            isPortrait = screen.orientation.type.includes("portrait");
+            isPortrait = screen.orientation.type.startsWith("portrait");
         } else if (typeof window.orientation !== "undefined") {
             isPortrait = window.orientation === 0 || window.orientation === 180;
         }
 
+        // Apply styles dynamically
         if (isPortrait) {
             // Portrait Mode - Controls at the Bottom
+            controlFrame.style.position = "fixed";
             controlFrame.style.bottom = "20px";
             controlFrame.style.left = "50%";
             controlFrame.style.top = "auto";
             controlFrame.style.right = "auto";
             controlFrame.style.transform = "translateX(-50%)";
-            controlFrame.style.flexDirection = "row"; // Keep horizontal
+            controlFrame.style.flexDirection = "row"; // Keep controls horizontal
+            controlFrame.style.width = "360px"; // Keep the original width
+            controlFrame.style.height = "100px"; // Maintain height
         } else {
             // Landscape Mode - Controls on the Right Side
+            controlFrame.style.position = "fixed";
             controlFrame.style.bottom = "auto";
             controlFrame.style.left = "auto";
             controlFrame.style.top = "50%";
             controlFrame.style.right = "20px";
             controlFrame.style.transform = "translateY(-50%)";
-            controlFrame.style.flexDirection = "column"; // Stack vertically
+            controlFrame.style.flexDirection = "column"; // Stack controls vertically
+            controlFrame.style.width = "100px"; // Adjust width for vertical layout
+            controlFrame.style.height = "360px"; // Increase height
         }
     }
 
-    // Initial check when the page loads
+    // Run the function once to set the initial state
     adjustControlsBasedOnOrientation();
 
-    // Listen for proper orientation change across all devices
-    window.addEventListener("resize", () => {
-        setTimeout(adjustControlsBasedOnOrientation, 150); // Small delay for mobile smoothness
-    });
+    // 🔥 BEST ORIENTATION DETECTION - Ensures smooth transitions on all devices
+    function onOrientationChange() {
+        requestAnimationFrame(adjustControlsBasedOnOrientation);
+    }
 
+    // ✅ Listen for all possible orientation changes
+    window.addEventListener("resize", onOrientationChange);
     if (screen.orientation) {
-        screen.orientation.addEventListener("change", adjustControlsBasedOnOrientation);
+        screen.orientation.addEventListener("change", onOrientationChange);
     } else {
-        window.addEventListener("orientationchange", adjustControlsBasedOnOrientation);
+        window.addEventListener("orientationchange", onOrientationChange);
     }
 });
 
