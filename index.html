@@ -31,13 +31,13 @@
     .clickable { pointer-events: auto; }
     
   /* Fixed Frame for Controls */
-#control-frame { 
+#control-frame {
   position: fixed;
-  bottom: 20px; /* Default position */
-  left: 50%; 
+  bottom: 20px;
+  left: 50%;
   transform: translateX(-50%);
-  width: 360px;
-  height: 100px; 
+  width: 360px; /* Ensures stable size */
+  height: 100px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -45,18 +45,35 @@
   padding: 10px;
   border-radius: 10px;
   z-index: 999;
-  transition: all 0.3s ease-in-out; /* Smooth transition */
+  transition: all 0.3s
 }
 
-#control-frame.landscape {
-  bottom: auto;
-  top: 50%;
-  left: auto;
-  right: 20px;
-  transform: translateY(-50%);
-  flex-direction: column; /* Stack buttons vertically */
-}
+    /* For Landscape Mode (mobile-only) */
+@media screen and (max-width: 768px) and (orientation: landscape) {
+  #control-frame {
+    bottom: auto;
+    top: 50%;
+    left: auto;
+    right: 10px;
+    transform: translateY(-50%);
+    flex-direction: column;
+    width: 80px;
+    height: auto;
+    justify-content: center;
+  }
 
+  #video-controls {
+    flex-direction: column;
+    width: auto;
+  }
+
+  #video-timeline {
+    transform: rotate(90deg);
+    width: 120px;
+    margin: 10px 0;
+  }
+}
+    
 /* Play/Pause Button */
 #play-pause-button {
   width: 50px;
@@ -617,63 +634,79 @@ document.querySelectorAll(".clickable").forEach((button) => {
   });
 
   // Handle iOS autoplay issues by ensuring a user interaction
- document.addEventListener("DOMContentLoaded", () => {
-    const controlFrame = document.getElementById("control-frame");
-
-    function adjustControlsBasedOnOrientation() {
-        let isPortrait = window.matchMedia("(orientation: portrait)").matches;
-
-        // Ensure backward compatibility with older browsers (iOS & Android)
-        if (screen.orientation) {
-            isPortrait = screen.orientation.type.startsWith("portrait");
-        } else if (typeof window.orientation !== "undefined") {
-            isPortrait = window.orientation === 0 || window.orientation === 180;
-        }
-
-        // Apply styles dynamically
-        if (isPortrait) {
-            // Portrait Mode - Controls at the Bottom
-            controlFrame.style.position = "fixed";
-            controlFrame.style.bottom = "20px";
-            controlFrame.style.left = "50%";
-            controlFrame.style.top = "auto";
-            controlFrame.style.right = "auto";
-            controlFrame.style.transform = "translateX(-50%)";
-            controlFrame.style.flexDirection = "row"; // Keep controls horizontal
-            controlFrame.style.width = "360px"; // Keep the original width
-            controlFrame.style.height = "100px"; // Maintain height
-        } else {
-            // Landscape Mode - Controls on the Right Side
-            controlFrame.style.position = "fixed";
-            controlFrame.style.bottom = "auto";
-            controlFrame.style.left = "auto";
-            controlFrame.style.top = "50%";
-            controlFrame.style.right = "20px";
-            controlFrame.style.transform = "translateY(-50%)";
-            controlFrame.style.flexDirection = "column"; // Stack controls vertically
-            controlFrame.style.width = "100px"; // Adjust width for vertical layout
-            controlFrame.style.height = "360px"; // Increase height
-        }
+  document.body.addEventListener("touchstart", () => {
+    if (introVideo.paused) {
+      introVideo.play().catch((e) => console.error("iOS Touch Play Error:", e));
     }
+  }, { once: true }); // Runs only once
 
-    // Run the function once to set the initial state
-    adjustControlsBasedOnOrientation();
-
-    // 🔥 BEST ORIENTATION DETECTION - Ensures smooth transitions on all devices
-    function onOrientationChange() {
-        requestAnimationFrame(adjustControlsBasedOnOrientation);
-    }
-
-    // ✅ Listen for all possible orientation changes
-    window.addEventListener("resize", onOrientationChange);
-    if (screen.orientation) {
-        screen.orientation.addEventListener("change", onOrientationChange);
-    } else {
-        window.addEventListener("orientationchange", onOrientationChange);
-    }
 });
+
+   function adjustControlsForOrientation() {
+  const controlFrame = document.getElementById("control-frame");
+  const videoControls = document.getElementById("video-controls");
+  const videoTimeline = document.getElementById("video-timeline");
+
+  if (window.matchMedia("(max-width: 768px)").matches) {
+    // Mobile Device Detected
+    if (window.matchMedia("(orientation: portrait)").matches) {
+      // Portrait Mode: Bottom-centered
+      controlFrame.style.position = "fixed";
+      controlFrame.style.bottom = "20px";
+      controlFrame.style.top = "auto";
+      controlFrame.style.left = "50%";
+      controlFrame.style.right = "auto";
+      controlFrame.style.transform = "translateX(-50%)";
+      controlFrame.style.flexDirection = "row";
+      controlFrame.style.width = "360px";
+      controlFrame.style.height = "100px";
+      videoControls.style.flexDirection = "row";
+      videoTimeline.style.transform = "none";
+      videoTimeline.style.width = "100%";
+    } else {
+      // Landscape Mode: Move to Right Sidebar
+      controlFrame.style.position = "fixed";
+      controlFrame.style.bottom = "auto";
+      controlFrame.style.top = "50%";
+      controlFrame.style.left = "auto";
+      controlFrame.style.right = "10px";
+      controlFrame.style.transform = "translateY(-50%)";
+      controlFrame.style.flexDirection = "column";
+      controlFrame.style.width = "80px";
+      controlFrame.style.height = "auto";
+      videoControls.style.flexDirection = "column";
+      videoTimeline.style.transform = "rotate(90deg)";
+      videoTimeline.style.width = "120px";
+      videoTimeline.style.margin = "10px 0";
+    }
+  } else {
+    // Desktop Mode (Keep default)
+    controlFrame.style.position = "fixed";
+    controlFrame.style.bottom = "20px";
+    controlFrame.style.left = "50%";
+    controlFrame.style.right = "auto";
+    controlFrame.style.top = "auto";
+    controlFrame.style.transform = "translateX(-50%)";
+    controlFrame.style.flexDirection = "row";
+    controlFrame.style.width = "360px";
+    controlFrame.style.height = "100px";
+    videoControls.style.flexDirection = "row";
+    videoTimeline.style.transform = "none";
+    videoTimeline.style.width = "100%";
+  }
+}
+
+// Detect orientation change and apply styles
+window.addEventListener("orientationchange", adjustControlsForOrientation);
+window.addEventListener("resize", adjustControlsForOrientation);
+
+// Run on page load
+document.addEventListener("DOMContentLoaded", adjustControlsForOrientation);
+
 
   </script>
 
 </body>
 </html>
+
+
