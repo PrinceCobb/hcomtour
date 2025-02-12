@@ -186,44 +186,31 @@ const allVideos = [
   fifthVideo, sixthVideo, sevVideo, eigVideo, nineVideo
 ]; 
 
-function requestMotionPermission() {
-    if (typeof DeviceMotionEvent !== "undefined" && typeof DeviceMotionEvent.requestPermission === "function") {
-        // Request motion sensor permission on iOS
-        DeviceMotionEvent.requestPermission()
-            .then((response) => {
-                if (response === "granted") {
-                    console.log("✅ Motion Sensor Access Granted Automatically");
-                    removeAFrameDialog(); // Hide the dialog after permission is granted
-                } else {
-                    console.warn("❌ Motion Sensor Access Denied");
-                }
-            })
-            .catch(console.error);
-    } else {
-        console.log("Motion permissions not required or unsupported.");
-        removeAFrameDialog(); // No permissions needed, just remove the dialog
-    }
-}
+function blockAFrameDialog() {
+    // Override the method A-Frame uses to show the dialog
+    Object.defineProperty(window, "DeviceMotionEvent", {
+        get: function () {
+            return undefined; // Trick A-Frame into thinking motion permissions are not required
+        },
+        configurable: true
+    });
 
-// Function to remove the A-Frame dialog box if it appears
-function removeAFrameDialog() {
+    // Remove any existing dialog box
     let checkExist = setInterval(() => {
-        let dialogBox = document.querySelector(".a-dialog"); // Adjust the selector if needed
+        let dialogBox = document.querySelector(".a-dialog"); // Adjust if needed
         if (dialogBox) {
-            dialogBox.style.display = "none"; // Hide the dialog box
-            clearInterval(checkExist); // Stop checking
-            console.log("🚀 Dialog Box Removed Successfully!");
+            dialogBox.remove(); // Completely delete the dialog box
+            clearInterval(checkExist);
+            console.log("🚀 A-Frame Dialog Blocked & Removed Successfully!");
         }
-    }, 500); // Check every 500ms
+    }, 100); // Check every 100ms
 }
 
-// Run after page load
+// Run before A-Frame initializes
 window.onload = () => {
-    setTimeout(() => {
-        requestMotionPermission();
-        removeAFrameDialog(); // Also check for dialog removal independently
-    }, 1000); // Delay to ensure everything is loaded
+    blockAFrameDialog();
 };
+
 
    
 // Step 1: Completely remove the video source on page load
