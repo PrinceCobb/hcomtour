@@ -8,26 +8,18 @@
   <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
   <script>
         async function enableMotionSensors() {
-            if (navigator.permissions) {
-                try {
-                    let permission = await navigator.permissions.query({ name: "gyroscope" });
-                    if (permission.state === "granted") {
+            try {
+                // Try to request permission (For iOS)
+                if (typeof DeviceMotionEvent !== "undefined" && typeof DeviceMotionEvent.requestPermission === "function") {
+                    const permission = await DeviceMotionEvent.requestPermission();
+                    if (permission === "granted") {
                         startMotionTracking();
-                        return;
                     }
-                } catch (e) {
-                    console.warn("Gyroscope permission query failed:", e);
+                } else {
+                    startMotionTracking();
                 }
-            }
-
-            if (typeof DeviceMotionEvent !== "undefined" && typeof DeviceMotionEvent.requestPermission === "function") {
-                DeviceMotionEvent.requestPermission().then(permissionState => {
-                    if (permissionState === "granted") {
-                        startMotionTracking();
-                    }
-                }).catch(console.error);
-            } else {
-                startMotionTracking();
+            } catch (error) {
+                console.error("Motion sensor access denied:", error);
             }
         }
 
@@ -37,15 +29,21 @@
             });
         }
 
-        // Force-enable motion sensors and prevent A-Frame's dialog
+        // Run on page load
         window.addEventListener("load", enableMotionSensors);
+        // Run on user interaction (For iOS)
         document.addEventListener("click", enableMotionSensors);
         document.addEventListener("touchstart", enableMotionSensors);
     </script>
     <style>
-        /* Completely hide A-Frame's default dialog */
+        /* Hide A-Frame's default dialog & dark overlay */
         .a-dialog-overlay, .a-dialog {
             display: none !important;
+        }
+
+        /* Remove any default dark background */
+        body {
+            background-color: white !important;
         }
     </style>
   <style>
