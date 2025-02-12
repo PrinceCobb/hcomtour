@@ -6,45 +6,16 @@
   <title>HCOM Tour</title>
   <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
   <script>
-(function completelyBlockAFrameDialog() {
-    console.log("🚀 FINAL FIX: Blocking A-Frame Dialog & Enabling Motion Sensors");
+(function hideAFrameDialogButEnableSensors() {
+    console.log("🚀 Hiding A-Frame Dialog & Enabling Motion Sensors");
 
-    // 1️⃣ **Intercept A-Frame's Dialog System Before It Loads**
-    Object.defineProperty(window, "AFRAME", {
-        get: function () {
-            return {
-                UI: {
-                    showImmersiveDialog: function () {
-                        console.log("🚀 A-Frame Dialog Blocked!");
-                    }
-                }
-            };
-        },
-        configurable: true
-    });
-
-    // 2️⃣ **Block Motion Sensor Permission Requests**
-    Object.defineProperty(navigator, "permissions", {
-        get: function () {
-            return {
-                query: async function (permission) {
-                    if (permission.name === "gyroscope" || permission.name === "accelerometer") {
-                        return { state: "granted" }; // Trick A-Frame into thinking permissions are already given
-                    }
-                    return { state: "granted" };
-                }
-            };
-        },
-        configurable: true
-    });
-
-    // 3️⃣ **Completely Remove the Dialog Box the Instant It Appears**
+    // 1️⃣ **Detect & Hide A-Frame Dialog Box**
     let observer = new MutationObserver((mutations) => {
         mutations.forEach((mutation) => {
             mutation.addedNodes.forEach((node) => {
                 if (node.classList && node.classList.contains("a-dialog")) {
-                    node.remove(); // Kill the dialog instantly
-                    console.log("🚀 Instantly Removed A-Frame Dialog!");
+                    node.style.display = "none"; // Hide the dialog instead of removing it
+                    console.log("🚀 A-Frame Dialog is Hidden!");
                 }
             });
         });
@@ -52,18 +23,18 @@
 
     observer.observe(document.body, { childList: true, subtree: true });
 
-    // 4️⃣ **Continuously Destroy Any Existing Dialog Box**
-    function destroyDialogs() {
+    // 2️⃣ **Continuously Hide Any Existing Dialog Box**
+    function hideExistingDialogs() {
         let dialog = document.querySelector(".a-dialog");
         if (dialog) {
-            dialog.remove();
-            console.log("🚀 Forcefully Deleted A-Frame Dialog!");
+            dialog.style.display = "none"; // Hide instead of removing
+            console.log("🚀 A-Frame Dialog is Now Hidden!");
         }
     }
 
-    setInterval(destroyDialogs, 1); // Check every 1ms for ultra-fast removal
+    setInterval(hideExistingDialogs, 100); // Check every 100ms to keep it hidden
 
-    // 5️⃣ **Force Enable Motion Sensors Without Any User Interaction**
+    // 3️⃣ **Auto-Allow Motion Sensors Without User Interaction**
     function enableMotionSensors() {
         if (typeof DeviceMotionEvent !== "undefined" && typeof DeviceMotionEvent.requestPermission === "function") {
             DeviceMotionEvent.requestPermission()
@@ -80,35 +51,12 @@
         }
     }
 
-    // 6️⃣ **Remove Any Dark Grey Overlays (UI Blockers)**
-    function removeGreyOverlay() {
-        document.querySelectorAll("div").forEach((node) => {
-            if (window.getComputedStyle(node).position === "fixed" &&
-                (window.getComputedStyle(node).backgroundColor === "rgba(0, 0, 0, 0.5)" ||
-                 window.getComputedStyle(node).backgroundColor === "rgb(0, 0, 0)")) {
-                node.remove();
-                console.log("🚀 Removed Dark Grey Overlay!");
-            }
-        });
-    }
-
-    // 7️⃣ **Disable Any Event Listeners That Might Trigger the Dialog**
-    document.addEventListener("DOMContentLoaded", function () {
-        window.addEventListener("devicemotion", function (event) {
-            event.stopImmediatePropagation(); // Prevent A-Frame from handling motion events
-        }, true);
-        window.addEventListener("deviceorientation", function (event) {
-            event.stopImmediatePropagation(); // Block motion sensor handling
-        }, true);
-    });
-
-    // 8️⃣ **Run Everything on Page Load for Instant Effect**
+    // 4️⃣ **Ensure Everything Runs on Page Load**
     window.onload = () => {
         setTimeout(() => {
             enableMotionSensors(); // Ensure motion sensors work
-            removeGreyOverlay(); // Delete UI blockers
-            destroyDialogs(); // Ensure no dialog appears
-        }, 100);
+            hideExistingDialogs(); // Ensure no dialog appears
+        }, 500);
     };
 
 })();
