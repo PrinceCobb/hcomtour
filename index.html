@@ -8,33 +8,32 @@
   <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
   <script>
         async function enableMotionSensors() {
-            try {
-                // Try to request permission (For iOS)
-                if (typeof DeviceMotionEvent !== "undefined" && typeof DeviceMotionEvent.requestPermission === "function") {
-                    const permission = await DeviceMotionEvent.requestPermission();
-                    if (permission === "granted") {
-                        startMotionTracking();
-                    }
-                } else {
+        try {
+            if (typeof DeviceMotionEvent !== "undefined" && typeof DeviceMotionEvent.requestPermission === "function") {
+                const permission = await DeviceMotionEvent.requestPermission();
+                if (permission === "granted") {
                     startMotionTracking();
                 }
-            } catch (error) {
-                console.error("Motion sensor access denied:", error);
+            } else {
+                startMotionTracking();
             }
+        } catch (error) {
+            console.error("Motion sensor access denied:", error);
         }
+    }
 
-        function startMotionTracking() {
-            window.addEventListener("devicemotion", (event) => {
-                console.log("Motion sensors activated:", event);
-            });
-        }
+    function startMotionTracking() {
+        window.addEventListener("devicemotion", (event) => {
+            console.log("Motion sensors activated:", event);
+        });
+    }
 
-        // Run on page load
-        window.addEventListener("load", enableMotionSensors);
-        // Run on user interaction (For iOS)
-        document.addEventListener("click", enableMotionSensors);
-        document.addEventListener("touchstart", enableMotionSensors);
+    // Ensure Motion Sensors Activate Immediately
+    document.addEventListener("DOMContentLoaded", enableMotionSensors);
+    document.addEventListener("click", enableMotionSensors);
+    document.addEventListener("touchstart", enableMotionSensors);
     </script>
+  
     <style>
         /* Hide A-Frame's default dialog & dark overlay */
         .a-dialog-overlay, .a-dialog {
@@ -47,6 +46,16 @@
         }
     </style>
   <style>
+     /* Hide A-Frame's Default Dialog & Dark Overlay */
+    .a-dialog-overlay, .a-dialog {
+        display: none !important;
+    }
+
+    /* Remove any unwanted dark background */
+    body {
+        background-color: white !important;
+    }
+    
     #play-button {
       position: absolute;
       top: calc(50% - 25px);
