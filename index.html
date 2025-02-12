@@ -7,38 +7,31 @@
   <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
   <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
   <script>
-document.addEventListener("DOMContentLoaded", function () {
+ function requestMotionAccess() {
             if (typeof DeviceMotionEvent !== "undefined" && typeof DeviceMotionEvent.requestPermission === "function") {
-                // iOS requires explicit permission for motion sensors
+                // iOS: Request motion permission on user interaction
                 DeviceMotionEvent.requestPermission().then(permissionState => {
                     if (permissionState === "granted") {
-                        // Permission granted, hide dialog and enable motion sensors
-                        document.getElementById("motion-dialog").style.display = "none";
+                        startMotionTracking();
                     }
                 }).catch(console.error);
             } else {
-                // Non-iOS devices: Hide dialog automatically
-                document.getElementById("motion-dialog").style.display = "none";
+                // Non-iOS devices: Start motion tracking immediately
+                startMotionTracking();
             }
-        });
-    </script>
-    <style>
-        .dialog-box {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            text-align: center;
-            z-index: 1000;
-            display: block; /* Default: visible until motion permission is granted */
         }
-    </style>
 
-  </script>
+        function startMotionTracking() {
+            window.addEventListener("devicemotion", (event) => {
+                console.log("Motion sensors activated:", event);
+            });
+        }
+
+        // Automatically try to enable motion sensors
+        document.addEventListener("click", requestMotionAccess);
+        document.addEventListener("touchstart", requestMotionAccess);
+    </script>
+  
   <style>
     #play-button {
       position: absolute;
