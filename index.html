@@ -5,61 +5,40 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>HCOM Tour</title>
   <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+  <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
   <script>
-function overrideImmersiveDialogStyles() {
-    // Wait for the dialog box to appear in the DOM
-    let checkExist = setInterval(() => {
-        let dialogBox = document.querySelector(".a-dialog"); // Adjust selector if needed
-
-        if (dialogBox) {
-            clearInterval(checkExist); // Stop checking once found
-
-            // Create a new style element
-            let style = document.createElement("style");
-            style.innerHTML = `
-                /* Target only the immersive dialog box */
-                .a-dialog {
-                    background-color: white !important;
-                    border-radius: 10px !important;
-                    padding: 20px !important;
-                    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2) !important;
-                    text-align: center !important;
-                }
-
-                /* Custom button styles inside the immersive dialog */
-                .a-dialog button {
-                    font-size: 16px !important;
-                    padding: 12px 20px !important;
-                    border-radius: 5px !important;
-                    font-weight: bold !important;
-                    cursor: pointer !important;
-                    border: none !important;
-                }
-
-                /* Styling the Deny button */
-                .a-dialog button:nth-child(1) {
-                    background-color: ##D3D3D3 !important;
-                    color: white !important;
-                }
-
-                /* Styling the Allow button */
-                .a-dialog button:nth-child(2) {
-                    background-color: #006A4B !important; 
-                    color: white !important;
-                }
-            `;
-
-            // Append the style to the document
-            document.head.appendChild(style);
+document.addEventListener("DOMContentLoaded", function () {
+            if (typeof DeviceMotionEvent !== "undefined" && typeof DeviceMotionEvent.requestPermission === "function") {
+                // iOS requires explicit permission for motion sensors
+                DeviceMotionEvent.requestPermission().then(permissionState => {
+                    if (permissionState === "granted") {
+                        // Permission granted, hide dialog and enable motion sensors
+                        document.getElementById("motion-dialog").style.display = "none";
+                    }
+                }).catch(console.error);
+            } else {
+                // Non-iOS devices: Hide dialog automatically
+                document.getElementById("motion-dialog").style.display = "none";
+            }
+        });
+    </script>
+    <style>
+        .dialog-box {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            z-index: 1000;
+            display: block; /* Default: visible until motion permission is granted */
         }
-    }, 500); // Check every 500ms
-}
-
-// Run after page load to ensure elements are available
-window.onload = overrideImmersiveDialogStyles;
+    </style>
 
   </script>
-  <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
   <style>
     #play-button {
       position: absolute;
