@@ -186,46 +186,57 @@ const allVideos = [
   fifthVideo, sixthVideo, sevVideo, eigVideo, nineVideo
 ]; 
 
-(function blockAFrameDialog() {
-    // 1. Intercept and disable A-Frame’s built-in dialog function
-    Object.defineProperty(window, "AFRAME", {
-        get: function () {
-            return {
-                UI: {
-                    showImmersiveDialog: function () {
-                        console.log("🚀 A-Frame Immersive Dialog Blocked!");
-                    }
+function overrideImmersiveDialogStyles() {
+    // Wait for the dialog box to appear in the DOM
+    let checkExist = setInterval(() => {
+        let dialogBox = document.querySelector(".a-dialog"); // Adjust selector if needed
+
+        if (dialogBox) {
+            clearInterval(checkExist); // Stop checking once found
+
+            // Create a new style element
+            let style = document.createElement("style");
+            style.innerHTML = `
+                /* Target only the immersive dialog box */
+                .a-dialog {
+                    background-color: white !important;
+                    border-radius: 10px !important;
+                    padding: 20px !important;
+                    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2) !important;
+                    text-align: center !important;
                 }
-            };
-        },
-        configurable: true
-    });
 
-    // 2. Continuously monitor and remove any dialog elements immediately
-    let observer = new MutationObserver((mutations) => {
-        mutations.forEach((mutation) => {
-            mutation.addedNodes.forEach((node) => {
-                if (node.classList && node.classList.contains("a-dialog")) {
-                    node.remove(); // Remove the dialog instantly before it's visible
-                    console.log("🚀 Removed A-Frame Dialog Instantly!");
+                /* Custom button styles inside the immersive dialog */
+                .a-dialog button {
+                    font-size: 16px !important;
+                    padding: 12px 20px !important;
+                    border-radius: 5px !important;
+                    font-weight: bold !important;
+                    cursor: pointer !important;
+                    border: none !important;
                 }
-            });
-        });
-    });
 
-    observer.observe(document.body, { childList: true, subtree: true });
+                /* Styling the Deny button */
+                .a-dialog button:nth-child(1) {
+                    background-color: #D3D3D3 !important;
+                    color: white !important;
+                }
 
-    // 3. Delete any existing dialogs on page load
-    function removeExistingDialogs() {
-        let dialog = document.querySelector(".a-dialog");
-        if (dialog) {
-            dialog.remove();
-            console.log("🚀 Deleted Existing Dialog!");
+                /* Styling the Allow button */
+                .a-dialog button:nth-child(2) {
+                    background-color: #006A4B !important;
+                    color: white !important;
+                }
+            `;
+
+            // Append the style to the document
+            document.head.appendChild(style);
         }
-    }
+    }, 500); // Check every 500ms
+}
 
-    setInterval(removeExistingDialogs, 10); // Keep checking and removing instantly
-})();
+// Run after page load to ensure elements are available
+window.onload = overrideImmersiveDialogStyles;
 
    
 // Step 1: Completely remove the video source on page load
