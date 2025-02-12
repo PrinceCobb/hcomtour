@@ -186,30 +186,55 @@ const allVideos = [
   fifthVideo, sixthVideo, sevVideo, eigVideo, nineVideo
 ]; 
 
-function blockAFrameDialog() {
-    // Override the method A-Frame uses to show the dialog
-    Object.defineProperty(window, "DeviceMotionEvent", {
+(function preventAFrameDialog() {
+    // Override the method A-Frame uses to trigger the immersive dialog
+    Object.defineProperty(navigator, "permissions", {
         get: function () {
-            return undefined; // Trick A-Frame into thinking motion permissions are not required
+            return {
+                query: async function (permission) {
+                    if (permission.name === "gyroscope" || permission.name === "accelerometer") {
+                        return { state: "granted" }; // Fake permission as "granted"
+                    }
+                    return { state: "granted" };
+                }
+            };
         },
         configurable: true
     });
 
-    // Remove any existing dialog box
-    let checkExist = setInterval(() => {
-        let dialogBox = document.querySelector(".a-dialog"); // Adjust if needed
-        if (dialogBox) {
-            dialogBox.remove(); // Completely delete the dialog box
-            clearInterval(checkExist);
-            console.log("🚀 A-Frame Dialog Blocked & Removed Successfully!");
-        }
-    }, 100); // Check every 100ms
-}
+    // Hijack the function that A-Frame uses to show the modal and block it
+    Object.defineProperty(window, "DeviceMotionEvent", {
+        get: function () {
+            return undefined; // Prevents A-Frame from even requesting motion permissions
+        },
+        configurable: true
+    });
 
-// Run before A-Frame initializes
-window.onload = () => {
-    blockAFrameDialog();
-};
+    // Prevent dialog box creation by blocking the mutation observer A-Frame might use
+    let observer = new MutationObserver((mutations) => {
+        mutations.forEach((mutation) => {
+            mutation.addedNodes.forEach((node) => {
+                if (node.classList && node.classList.contains("a-dialog")) {
+                    node.remove(); // Remove the dialog instantly before it's visible
+                    console.log("🚀 Blocked A-Frame Permission Dialog Instantly!");
+                }
+            });
+        });
+    });
+
+    observer.observe(document.body, { childList: true, subtree: true });
+
+    // Remove any dialog box if it somehow appears
+    function removeExistingDialogs() {
+        let dialog = document.querySelector(".a-dialog");
+        if (dialog) {
+            dialog.remove();
+            console.log("🚀 Removed Existing Dialog Box!");
+        }
+    }
+
+    setInterval(removeExistingDialogs, 50); // Keep checking and removing instantly
+})();
 
 
    
