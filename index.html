@@ -188,24 +188,41 @@ const allVideos = [
 
 function requestMotionPermission() {
     if (typeof DeviceMotionEvent !== "undefined" && typeof DeviceMotionEvent.requestPermission === "function") {
-        // iOS requires explicit user interaction to grant permission
+        // Request motion sensor permission on iOS
         DeviceMotionEvent.requestPermission()
             .then((response) => {
                 if (response === "granted") {
                     console.log("✅ Motion Sensor Access Granted Automatically");
+                    removeAFrameDialog(); // Hide the dialog after permission is granted
                 } else {
                     console.warn("❌ Motion Sensor Access Denied");
                 }
             })
             .catch(console.error);
     } else {
-        console.log("Device Motion Permissions Not Required or Unsupported");
+        console.log("Motion permissions not required or unsupported.");
+        removeAFrameDialog(); // No permissions needed, just remove the dialog
     }
+}
+
+// Function to remove the A-Frame dialog box if it appears
+function removeAFrameDialog() {
+    let checkExist = setInterval(() => {
+        let dialogBox = document.querySelector(".a-dialog"); // Adjust the selector if needed
+        if (dialogBox) {
+            dialogBox.style.display = "none"; // Hide the dialog box
+            clearInterval(checkExist); // Stop checking
+            console.log("🚀 Dialog Box Removed Successfully!");
+        }
+    }, 500); // Check every 500ms
 }
 
 // Run after page load
 window.onload = () => {
-    setTimeout(requestMotionPermission, 1000); // Delay to ensure page is fully loaded
+    setTimeout(() => {
+        requestMotionPermission();
+        removeAFrameDialog(); // Also check for dialog removal independently
+    }, 1000); // Delay to ensure everything is loaded
 };
 
    
