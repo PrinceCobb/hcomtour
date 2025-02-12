@@ -186,57 +186,78 @@ const allVideos = [
   fifthVideo, sixthVideo, sevVideo, eigVideo, nineVideo
 ]; 
 
-function overrideImmersiveDialogStyles() {
-    // Wait for the dialog box to appear in the DOM
-    let checkExist = setInterval(() => {
-        let dialogBox = document.querySelector(".a-dialog"); // Adjust selector if needed
+(function fixAFrameUI() {
+    console.log("🚀 Fixing A-Frame UI & Enabling Motion Sensors");
 
-        if (dialogBox) {
-            clearInterval(checkExist); // Stop checking once found
-
-            // Create a new style element
-            let style = document.createElement("style");
-            style.innerHTML = `
-                /* Target only the immersive dialog box */
-                .a-dialog {
-                    background-color: white !important;
-                    border-radius: 10px !important;
-                    padding: 20px !important;
-                    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2) !important;
-                    text-align: center !important;
-                }
-
-                /* Custom button styles inside the immersive dialog */
-                .a-dialog button {
-                    font-size: 16px !important;
-                    padding: 12px 20px !important;
-                    border-radius: 5px !important;
-                    font-weight: bold !important;
-                    cursor: pointer !important;
-                    border: none !important;
-                }
-
-                /* Styling the Deny button */
-                .a-dialog button:nth-child(1) {
-                    background-color: #D3D3D3 !important;
-                    color: white !important;
-                }
-
-                /* Styling the Allow button */
-                .a-dialog button:nth-child(2) {
-                    background-color: #006A4B !important;
-                    color: white !important;
-                }
-            `;
-
-            // Append the style to the document
-            document.head.appendChild(style);
+    // 1️⃣ Ensure Motion Sensors Are Automatically Allowed
+    function requestMotionPermission() {
+        if (typeof DeviceMotionEvent !== "undefined" && typeof DeviceMotionEvent.requestPermission === "function") {
+            DeviceMotionEvent.requestPermission()
+                .then((response) => {
+                    if (response === "granted") {
+                        console.log("✅ Motion Sensor Access Granted");
+                    } else {
+                        console.warn("❌ Motion Sensor Access Denied");
+                    }
+                })
+                .catch(console.error);
+        } else {
+            console.log("✅ Motion Sensors Do Not Require Permission on This Device");
         }
-    }, 500); // Check every 500ms
-}
+    }
 
-// Run after page load to ensure elements are available
-window.onload = overrideImmersiveDialogStyles;
+    // 2️⃣ Completely Remove Dark Grey Overlay
+    function removeGreyOverlay() {
+        let observer = new MutationObserver((mutations) => {
+            mutations.forEach((mutation) => {
+                mutation.addedNodes.forEach((node) => {
+                    if (node.tagName === "DIV" && window.getComputedStyle(node).position === "fixed") {
+                        if (window.getComputedStyle(node).backgroundColor === "rgba(0, 0, 0, 0.5)" || 
+                            window.getComputedStyle(node).backgroundColor === "rgb(0, 0, 0)") {
+                            node.remove(); // Remove the dark overlay
+                            console.log("🚀 Removed Dark Grey Overlay!");
+                        }
+                    }
+                });
+            });
+        });
+
+        observer.observe(document.body, { childList: true, subtree: true });
+
+        // Remove any existing overlays immediately
+        document.querySelectorAll("div").forEach((node) => {
+            if (window.getComputedStyle(node).position === "fixed" && 
+                (window.getComputedStyle(node).backgroundColor === "rgba(0, 0, 0, 0.5)" || 
+                window.getComputedStyle(node).backgroundColor === "rgb(0, 0, 0)")) {
+                node.remove();
+                console.log("🚀 Deleted Existing Dark Overlay!");
+            }
+        });
+    }
+
+    // 3️⃣ Override A-Frame’s Functions to Prevent UI Interference
+    Object.defineProperty(window, "AFRAME", {
+        get: function () {
+            return {
+                UI: {
+                    showImmersiveDialog: function () {
+                        console.log("🚀 Blocked A-Frame Immersive Dialog!");
+                    }
+                }
+            };
+        },
+        configurable: true
+    });
+
+    // 4️⃣ Run Everything on Page Load
+    window.onload = () => {
+        setTimeout(() => {
+            requestMotionPermission(); // Enable motion sensors
+            removeGreyOverlay(); // Remove UI block
+        }, 500);
+    };
+
+})();
 
    
 // Step 1: Completely remove the video source on page load
