@@ -186,57 +186,27 @@ const allVideos = [
   fifthVideo, sixthVideo, sevVideo, eigVideo, nineVideo
 ]; 
 
-function overrideImmersiveDialogStyles() {
-    // Wait for the dialog box to appear in the DOM
-    let checkExist = setInterval(() => {
-        let dialogBox = document.querySelector(".a-dialog"); // Adjust selector if needed
-
-        if (dialogBox) {
-            clearInterval(checkExist); // Stop checking once found
-
-            // Create a new style element
-            let style = document.createElement("style");
-            style.innerHTML = `
-                /* Target only the immersive dialog box */
-                .a-dialog {
-                    background-color: white !important;
-                    border-radius: 10px !important;
-                    padding: 20px !important;
-                    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2) !important;
-                    text-align: center !important;
+function requestMotionPermission() {
+    if (typeof DeviceMotionEvent !== "undefined" && typeof DeviceMotionEvent.requestPermission === "function") {
+        // iOS requires explicit user interaction to grant permission
+        DeviceMotionEvent.requestPermission()
+            .then((response) => {
+                if (response === "granted") {
+                    console.log("✅ Motion Sensor Access Granted Automatically");
+                } else {
+                    console.warn("❌ Motion Sensor Access Denied");
                 }
-
-                /* Custom button styles inside the immersive dialog */
-                .a-dialog button {
-                    font-size: 16px !important;
-                    padding: 12px 20px !important;
-                    border-radius: 5px !important;
-                    font-weight: bold !important;
-                    cursor: pointer !important;
-                    border: none !important;
-                }
-
-                /* Styling the Deny button */
-                .a-dialog button:nth-child(1) {
-                    background-color: #ff007f !important; /* Pink */
-                    color: white !important;
-                }
-
-                /* Styling the Allow button */
-                .a-dialog button:nth-child(2) {
-                    background-color: #00bfff !important; /* Blue */
-                    color: white !important;
-                }
-            `;
-
-            // Append the style to the document
-            document.head.appendChild(style);
-        }
-    }, 500); // Check every 500ms
+            })
+            .catch(console.error);
+    } else {
+        console.log("Device Motion Permissions Not Required or Unsupported");
+    }
 }
 
-// Run after page load to ensure elements are available
-window.onload = overrideImmersiveDialogStyles;
+// Run after page load
+window.onload = () => {
+    setTimeout(requestMotionPermission, 1000); // Delay to ensure page is fully loaded
+};
 
    
 // Step 1: Completely remove the video source on page load
