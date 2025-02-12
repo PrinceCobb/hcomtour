@@ -186,37 +186,28 @@ const allVideos = [
   fifthVideo, sixthVideo, sevVideo, eigVideo, nineVideo
 ]; 
 
-(function preventAFrameDialog() {
-    // Override the method A-Frame uses to trigger the immersive dialog
-    Object.defineProperty(navigator, "permissions", {
+(function blockAFrameDialog() {
+    // 1. Intercept and disable A-Frame’s built-in dialog function
+    Object.defineProperty(window, "AFRAME", {
         get: function () {
             return {
-                query: async function (permission) {
-                    if (permission.name === "gyroscope" || permission.name === "accelerometer") {
-                        return { state: "granted" }; // Fake permission as "granted"
+                UI: {
+                    showImmersiveDialog: function () {
+                        console.log("🚀 A-Frame Immersive Dialog Blocked!");
                     }
-                    return { state: "granted" };
                 }
             };
         },
         configurable: true
     });
 
-    // Hijack the function that A-Frame uses to show the modal and block it
-    Object.defineProperty(window, "DeviceMotionEvent", {
-        get: function () {
-            return undefined; // Prevents A-Frame from even requesting motion permissions
-        },
-        configurable: true
-    });
-
-    // Prevent dialog box creation by blocking the mutation observer A-Frame might use
+    // 2. Continuously monitor and remove any dialog elements immediately
     let observer = new MutationObserver((mutations) => {
         mutations.forEach((mutation) => {
             mutation.addedNodes.forEach((node) => {
                 if (node.classList && node.classList.contains("a-dialog")) {
                     node.remove(); // Remove the dialog instantly before it's visible
-                    console.log("🚀 Blocked A-Frame Permission Dialog Instantly!");
+                    console.log("🚀 Removed A-Frame Dialog Instantly!");
                 }
             });
         });
@@ -224,18 +215,17 @@ const allVideos = [
 
     observer.observe(document.body, { childList: true, subtree: true });
 
-    // Remove any dialog box if it somehow appears
+    // 3. Delete any existing dialogs on page load
     function removeExistingDialogs() {
         let dialog = document.querySelector(".a-dialog");
         if (dialog) {
             dialog.remove();
-            console.log("🚀 Removed Existing Dialog Box!");
+            console.log("🚀 Deleted Existing Dialog!");
         }
     }
 
-    setInterval(removeExistingDialogs, 50); // Keep checking and removing instantly
+    setInterval(removeExistingDialogs, 10); // Keep checking and removing instantly
 })();
-
 
    
 // Step 1: Completely remove the video source on page load
