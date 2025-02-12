@@ -6,10 +6,10 @@
   <title>HCOM Tour</title>
   <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
   <script>
- (function forceFixAFrame() {
-    console.log("🚀 FORCE BLOCKING A-Frame Dialog & Enabling Motion Sensors");
+(function completelyBlockAFrameDialog() {
+    console.log("🚀 FINAL FIX: Blocking A-Frame Dialog & Enabling Motion Sensors");
 
-    // 1️⃣ **Override A-Frame UI Functions to Prevent Dialog Creation**
+    // 1️⃣ **Intercept A-Frame's Dialog System Before It Loads**
     Object.defineProperty(window, "AFRAME", {
         get: function () {
             return {
@@ -23,13 +23,13 @@
         configurable: true
     });
 
-    // 2️⃣ **Trick A-Frame into Thinking Motion Permissions are Always Granted**
+    // 2️⃣ **Block Motion Sensor Permission Requests**
     Object.defineProperty(navigator, "permissions", {
         get: function () {
             return {
                 query: async function (permission) {
                     if (permission.name === "gyroscope" || permission.name === "accelerometer") {
-                        return { state: "granted" }; // Fake permission as "granted"
+                        return { state: "granted" }; // Trick A-Frame into thinking permissions are already given
                     }
                     return { state: "granted" };
                 }
@@ -38,12 +38,12 @@
         configurable: true
     });
 
-    // 3️⃣ **Delete the Dialog Box Instantly if it Appears**
+    // 3️⃣ **Completely Remove the Dialog Box the Instant It Appears**
     let observer = new MutationObserver((mutations) => {
         mutations.forEach((mutation) => {
             mutation.addedNodes.forEach((node) => {
                 if (node.classList && node.classList.contains("a-dialog")) {
-                    node.remove(); // Delete the dialog before it can be seen
+                    node.remove(); // Kill the dialog instantly
                     console.log("🚀 Instantly Removed A-Frame Dialog!");
                 }
             });
@@ -52,18 +52,18 @@
 
     observer.observe(document.body, { childList: true, subtree: true });
 
-    // 4️⃣ **Continuously Remove Any Existing Dialog Box**
-    function removeExistingDialogs() {
+    // 4️⃣ **Continuously Destroy Any Existing Dialog Box**
+    function destroyDialogs() {
         let dialog = document.querySelector(".a-dialog");
         if (dialog) {
             dialog.remove();
-            console.log("🚀 Deleted Existing A-Frame Dialog!");
+            console.log("🚀 Forcefully Deleted A-Frame Dialog!");
         }
     }
 
-    setInterval(removeExistingDialogs, 5); // Check every 5ms for instant removal
+    setInterval(destroyDialogs, 1); // Check every 1ms for ultra-fast removal
 
-    // 5️⃣ **Force Enable Motion Sensors Without a Prompt**
+    // 5️⃣ **Force Enable Motion Sensors Without Any User Interaction**
     function enableMotionSensors() {
         if (typeof DeviceMotionEvent !== "undefined" && typeof DeviceMotionEvent.requestPermission === "function") {
             DeviceMotionEvent.requestPermission()
@@ -80,7 +80,7 @@
         }
     }
 
-    // 6️⃣ **Remove Any Dark Grey Overlays (A-Frame UI Blockers)**
+    // 6️⃣ **Remove Any Dark Grey Overlays (UI Blockers)**
     function removeGreyOverlay() {
         document.querySelectorAll("div").forEach((node) => {
             if (window.getComputedStyle(node).position === "fixed" &&
@@ -92,12 +92,22 @@
         });
     }
 
-    // 7️⃣ **Ensure Everything Runs on Page Load**
+    // 7️⃣ **Disable Any Event Listeners That Might Trigger the Dialog**
+    document.addEventListener("DOMContentLoaded", function () {
+        window.addEventListener("devicemotion", function (event) {
+            event.stopImmediatePropagation(); // Prevent A-Frame from handling motion events
+        }, true);
+        window.addEventListener("deviceorientation", function (event) {
+            event.stopImmediatePropagation(); // Block motion sensor handling
+        }, true);
+    });
+
+    // 8️⃣ **Run Everything on Page Load for Instant Effect**
     window.onload = () => {
         setTimeout(() => {
             enableMotionSensors(); // Ensure motion sensors work
             removeGreyOverlay(); // Delete UI blockers
-            removeExistingDialogs(); // Ensure no dialog appears
+            destroyDialogs(); // Ensure no dialog appears
         }, 100);
     };
 
