@@ -5,6 +5,106 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>HCOM Tour</title>
   <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+  <script>
+  (function fullyFixAFrame() {
+    console.log("🚀 Fully Blocking A-Frame Dialog & Enabling Motion Sensors");
+
+    // 1️⃣ **Completely Block A-Frame's Immersive Dialog System**
+    Object.defineProperty(window, "AFRAME", {
+        get: function () {
+            return {
+                UI: {
+                    showImmersiveDialog: function () {
+                        console.log("🚀 Blocked A-Frame Immersive Dialog!");
+                    }
+                }
+            };
+        },
+        configurable: true
+    });
+
+    // 2️⃣ **Prevent Motion Sensor Permission Prompts**
+    Object.defineProperty(navigator, "permissions", {
+        get: function () {
+            return {
+                query: async function (permission) {
+                    if (permission.name === "gyroscope" || permission.name === "accelerometer") {
+                        return { state: "granted" }; // Trick A-Frame into thinking permissions are already given
+                    }
+                    return { state: "granted" };
+                }
+            };
+        },
+        configurable: true
+    });
+
+    // 3️⃣ **Detect and Instantly Remove Any Dialogs Before They Show**
+    let observer = new MutationObserver((mutations) => {
+        mutations.forEach((mutation) => {
+            mutation.addedNodes.forEach((node) => {
+                if (node.classList && node.classList.contains("a-dialog")) {
+                    node.remove(); // Completely remove the dialog box
+                    console.log("🚀 Instantly Removed A-Frame Dialog!");
+                }
+            });
+        });
+    });
+
+    observer.observe(document.body, { childList: true, subtree: true });
+
+    // 4️⃣ **Continuously Remove Any Existing Dialog Box**
+    function removeExistingDialogs() {
+        let dialog = document.querySelector(".a-dialog");
+        if (dialog) {
+            dialog.remove();
+            console.log("🚀 Deleted Existing A-Frame Dialog!");
+        }
+    }
+
+    setInterval(removeExistingDialogs, 10); // Check every 10ms for maximum effectiveness
+
+    // 5️⃣ **Force Motion Sensor Permissions Without User Interaction**
+    function requestMotionPermission() {
+        if (typeof DeviceMotionEvent !== "undefined" && typeof DeviceMotionEvent.requestPermission === "function") {
+            DeviceMotionEvent.requestPermission()
+                .then((response) => {
+                    if (response === "granted") {
+                        console.log("✅ Motion Sensor Access Granted Automatically");
+                    } else {
+                        console.warn("❌ Motion Sensor Access Denied");
+                    }
+                })
+                .catch(console.error);
+        } else {
+            console.log("✅ Motion Sensors Do Not Require Permission on This Device");
+        }
+    }
+
+    // 6️⃣ **Remove Dark Grey Overlays (A-Frame UI Blockers)**
+    function removeGreyOverlay() {
+        document.querySelectorAll("div").forEach((node) => {
+            if (window.getComputedStyle(node).position === "fixed" &&
+                (window.getComputedStyle(node).backgroundColor === "rgba(0, 0, 0, 0.5)" ||
+                 window.getComputedStyle(node).backgroundColor === "rgb(0, 0, 0)")) {
+                node.remove();
+                console.log("🚀 Removed Dark Grey Overlay!");
+            }
+        });
+    }
+
+    // 7️⃣ **Run Everything on Page Load for Maximum Effect**
+    window.onload = () => {
+        setTimeout(() => {
+            requestMotionPermission(); // Enable motion sensors automatically
+            removeGreyOverlay(); // Remove any UI block
+            removeExistingDialogs(); // Ensure no dialog appears
+        }, 500);
+    };
+
+})();
+
+    
+  </script>
   <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
   <style>
     #play-button {
@@ -184,106 +284,7 @@ const videoControls = document.getElementById("video-controls");
 const allVideos = [
   introVideo, secVideo, thirdVideo, fourthVideo,
   fifthVideo, sixthVideo, sevVideo, eigVideo, nineVideo
-]; 
-
-(function completelyBlockAFrameDialog() {
-    console.log("🚀 Completely Blocking A-Frame Dialog and Overlays");
-
-    // 1️⃣ Intercept A-Frame UI System and Prevent Dialog Creation
-    Object.defineProperty(window, "AFRAME", {
-        get: function () {
-            return {
-                UI: {
-                    showImmersiveDialog: function () {
-                        console.log("🚀 Blocked A-Frame Immersive Dialog!");
-                    }
-                }
-            };
-        },
-        configurable: true
-    });
-
-    // 2️⃣ Prevent Motion Sensor Requests from Triggering a Dialog
-    Object.defineProperty(navigator, "permissions", {
-        get: function () {
-            return {
-                query: async function (permission) {
-                    if (permission.name === "gyroscope" || permission.name === "accelerometer") {
-                        return { state: "granted" }; // Fake permission as "granted"
-                    }
-                    return { state: "granted" };
-                }
-            };
-        },
-        configurable: true
-    });
-
-    // 3️⃣ Continuously Monitor & Remove Dialog Instantly If It Appears
-    let observer = new MutationObserver((mutations) => {
-        mutations.forEach((mutation) => {
-            mutation.addedNodes.forEach((node) => {
-                if (node.classList && node.classList.contains("a-dialog")) {
-                    node.remove(); // Remove the dialog instantly before it's visible
-                    console.log("🚀 Instantly Removed A-Frame Dialog!");
-                }
-            });
-        });
-    });
-
-    observer.observe(document.body, { childList: true, subtree: true });
-
-    // 4️⃣ Remove Any Existing Dialog Box on Page Load
-    function removeExistingDialogs() {
-        let dialog = document.querySelector(".a-dialog");
-        if (dialog) {
-            dialog.remove();
-            console.log("🚀 Deleted Existing Dialog!");
-        }
-    }
-
-    setInterval(removeExistingDialogs, 10); // Keep checking and removing instantly
-
-    // 5️⃣ Auto-Allow Motion Sensors Without Prompt
-    function requestMotionPermission() {
-        if (typeof DeviceMotionEvent !== "undefined" && typeof DeviceMotionEvent.requestPermission === "function") {
-            DeviceMotionEvent.requestPermission()
-                .then((response) => {
-                    if (response === "granted") {
-                        console.log("✅ Motion Sensor Access Granted");
-                    } else {
-                        console.warn("❌ Motion Sensor Access Denied");
-                    }
-                })
-                .catch(console.error);
-        } else {
-            console.log("✅ Motion Sensors Do Not Require Permission on This Device");
-        }
-    }
-
-    // 6️⃣ Remove Any Dark Grey Overlays
-    function removeGreyOverlay() {
-        document.querySelectorAll("div").forEach((node) => {
-            if (window.getComputedStyle(node).position === "fixed" &&
-                (window.getComputedStyle(node).backgroundColor === "rgba(0, 0, 0, 0.5)" ||
-                 window.getComputedStyle(node).backgroundColor === "rgb(0, 0, 0)")) {
-                node.remove();
-                console.log("🚀 Deleted Existing Dark Overlay!");
-            }
-        });
-    }
-
-    // 7️⃣ Run Everything After Page Load
-    window.onload = () => {
-        setTimeout(() => {
-            requestMotionPermission(); // Enable motion sensors
-            removeGreyOverlay(); // Remove dark UI overlay
-            removeExistingDialogs(); // Ensure no dialog appears
-        }, 500);
-    };
-
-})();
-
-
+];
    
 // Step 1: Completely remove the video source on page load
     document.addEventListener("DOMContentLoaded", () => {
