@@ -7,7 +7,7 @@
   <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
   <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
   <script>
-  async function enableMotionSensors() {
+        async function enableMotionSensors() {
             if (navigator.permissions) {
                 try {
                     let permission = await navigator.permissions.query({ name: "gyroscope" });
@@ -47,8 +47,7 @@
         .a-dialog-overlay, .a-dialog {
             display: none !important;
         }
-    </script>
-  
+    </style>
   <style>
     #play-button {
       position: absolute;
@@ -227,7 +226,7 @@ const videoControls = document.getElementById("video-controls");
 const allVideos = [
   introVideo, secVideo, thirdVideo, fourthVideo,
   fifthVideo, sixthVideo, sevVideo, eigVideo, nineVideo
-];
+]; 
    
 // Step 1: Completely remove the video source on page load
     document.addEventListener("DOMContentLoaded", () => {
@@ -668,4 +667,3 @@ document.querySelectorAll(".clickable").forEach((button) => {
 
 </body>
 </html>
-
