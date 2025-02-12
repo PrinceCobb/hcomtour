@@ -186,10 +186,64 @@ const allVideos = [
   fifthVideo, sixthVideo, sevVideo, eigVideo, nineVideo
 ]; 
 
-(function fixAFrameUI() {
-    console.log("🚀 Fixing A-Frame UI & Enabling Motion Sensors");
+(function completelyBlockAFrameDialog() {
+    console.log("🚀 Completely Blocking A-Frame Dialog and Overlays");
 
-    // 1️⃣ Ensure Motion Sensors Are Automatically Allowed
+    // 1️⃣ Intercept A-Frame UI System and Prevent Dialog Creation
+    Object.defineProperty(window, "AFRAME", {
+        get: function () {
+            return {
+                UI: {
+                    showImmersiveDialog: function () {
+                        console.log("🚀 Blocked A-Frame Immersive Dialog!");
+                    }
+                }
+            };
+        },
+        configurable: true
+    });
+
+    // 2️⃣ Prevent Motion Sensor Requests from Triggering a Dialog
+    Object.defineProperty(navigator, "permissions", {
+        get: function () {
+            return {
+                query: async function (permission) {
+                    if (permission.name === "gyroscope" || permission.name === "accelerometer") {
+                        return { state: "granted" }; // Fake permission as "granted"
+                    }
+                    return { state: "granted" };
+                }
+            };
+        },
+        configurable: true
+    });
+
+    // 3️⃣ Continuously Monitor & Remove Dialog Instantly If It Appears
+    let observer = new MutationObserver((mutations) => {
+        mutations.forEach((mutation) => {
+            mutation.addedNodes.forEach((node) => {
+                if (node.classList && node.classList.contains("a-dialog")) {
+                    node.remove(); // Remove the dialog instantly before it's visible
+                    console.log("🚀 Instantly Removed A-Frame Dialog!");
+                }
+            });
+        });
+    });
+
+    observer.observe(document.body, { childList: true, subtree: true });
+
+    // 4️⃣ Remove Any Existing Dialog Box on Page Load
+    function removeExistingDialogs() {
+        let dialog = document.querySelector(".a-dialog");
+        if (dialog) {
+            dialog.remove();
+            console.log("🚀 Deleted Existing Dialog!");
+        }
+    }
+
+    setInterval(removeExistingDialogs, 10); // Keep checking and removing instantly
+
+    // 5️⃣ Auto-Allow Motion Sensors Without Prompt
     function requestMotionPermission() {
         if (typeof DeviceMotionEvent !== "undefined" && typeof DeviceMotionEvent.requestPermission === "function") {
             DeviceMotionEvent.requestPermission()
@@ -206,58 +260,29 @@ const allVideos = [
         }
     }
 
-    // 2️⃣ Completely Remove Dark Grey Overlay
+    // 6️⃣ Remove Any Dark Grey Overlays
     function removeGreyOverlay() {
-        let observer = new MutationObserver((mutations) => {
-            mutations.forEach((mutation) => {
-                mutation.addedNodes.forEach((node) => {
-                    if (node.tagName === "DIV" && window.getComputedStyle(node).position === "fixed") {
-                        if (window.getComputedStyle(node).backgroundColor === "rgba(0, 0, 0, 0.5)" || 
-                            window.getComputedStyle(node).backgroundColor === "rgb(0, 0, 0)") {
-                            node.remove(); // Remove the dark overlay
-                            console.log("🚀 Removed Dark Grey Overlay!");
-                        }
-                    }
-                });
-            });
-        });
-
-        observer.observe(document.body, { childList: true, subtree: true });
-
-        // Remove any existing overlays immediately
         document.querySelectorAll("div").forEach((node) => {
-            if (window.getComputedStyle(node).position === "fixed" && 
-                (window.getComputedStyle(node).backgroundColor === "rgba(0, 0, 0, 0.5)" || 
-                window.getComputedStyle(node).backgroundColor === "rgb(0, 0, 0)")) {
+            if (window.getComputedStyle(node).position === "fixed" &&
+                (window.getComputedStyle(node).backgroundColor === "rgba(0, 0, 0, 0.5)" ||
+                 window.getComputedStyle(node).backgroundColor === "rgb(0, 0, 0)")) {
                 node.remove();
                 console.log("🚀 Deleted Existing Dark Overlay!");
             }
         });
     }
 
-    // 3️⃣ Override A-Frame’s Functions to Prevent UI Interference
-    Object.defineProperty(window, "AFRAME", {
-        get: function () {
-            return {
-                UI: {
-                    showImmersiveDialog: function () {
-                        console.log("🚀 Blocked A-Frame Immersive Dialog!");
-                    }
-                }
-            };
-        },
-        configurable: true
-    });
-
-    // 4️⃣ Run Everything on Page Load
+    // 7️⃣ Run Everything After Page Load
     window.onload = () => {
         setTimeout(() => {
             requestMotionPermission(); // Enable motion sensors
-            removeGreyOverlay(); // Remove UI block
+            removeGreyOverlay(); // Remove dark UI overlay
+            removeExistingDialogs(); // Ensure no dialog appears
         }, 500);
     };
 
 })();
+
 
    
 // Step 1: Completely remove the video source on page load
