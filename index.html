@@ -7,16 +7,26 @@
   <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
   <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
   <script>
- function requestMotionAccess() {
+  async function enableMotionSensors() {
+            if (navigator.permissions) {
+                try {
+                    let permission = await navigator.permissions.query({ name: "gyroscope" });
+                    if (permission.state === "granted") {
+                        startMotionTracking();
+                        return;
+                    }
+                } catch (e) {
+                    console.warn("Gyroscope permission query failed:", e);
+                }
+            }
+
             if (typeof DeviceMotionEvent !== "undefined" && typeof DeviceMotionEvent.requestPermission === "function") {
-                // iOS: Request motion permission on user interaction
                 DeviceMotionEvent.requestPermission().then(permissionState => {
                     if (permissionState === "granted") {
                         startMotionTracking();
                     }
                 }).catch(console.error);
             } else {
-                // Non-iOS devices: Start motion tracking immediately
                 startMotionTracking();
             }
         }
@@ -27,9 +37,16 @@
             });
         }
 
-        // Automatically try to enable motion sensors
-        document.addEventListener("click", requestMotionAccess);
-        document.addEventListener("touchstart", requestMotionAccess);
+        // Force-enable motion sensors and prevent A-Frame's dialog
+        window.addEventListener("load", enableMotionSensors);
+        document.addEventListener("click", enableMotionSensors);
+        document.addEventListener("touchstart", enableMotionSensors);
+    </script>
+    <style>
+        /* Completely hide A-Frame's default dialog */
+        .a-dialog-overlay, .a-dialog {
+            display: none !important;
+        }
     </script>
   
   <style>
