@@ -6,60 +6,57 @@
   <title>HCOM Tour</title>
   <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
   <script>
-(function hideAFrameDialogButEnableSensors() {
-    console.log("🚀 Hiding A-Frame Dialog & Enabling Motion Sensors");
+function overrideImmersiveDialogStyles() {
+    // Wait for the dialog box to appear in the DOM
+    let checkExist = setInterval(() => {
+        let dialogBox = document.querySelector(".a-dialog"); // Adjust selector if needed
 
-    // 1️⃣ **Detect & Hide A-Frame Dialog Box**
-    let observer = new MutationObserver((mutations) => {
-        mutations.forEach((mutation) => {
-            mutation.addedNodes.forEach((node) => {
-                if (node.classList && node.classList.contains("a-dialog")) {
-                    node.style.display = "none"; // Hide the dialog instead of removing it
-                    console.log("🚀 A-Frame Dialog is Hidden!");
+        if (dialogBox) {
+            clearInterval(checkExist); // Stop checking once found
+
+            // Create a new style element
+            let style = document.createElement("style");
+            style.innerHTML = `
+                /* Target only the immersive dialog box */
+                .a-dialog {
+                    background-color: white !important;
+                    border-radius: 10px !important;
+                    padding: 20px !important;
+                    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2) !important;
+                    text-align: center !important;
                 }
-            });
-        });
-    });
 
-    observer.observe(document.body, { childList: true, subtree: true });
+                /* Custom button styles inside the immersive dialog */
+                .a-dialog button {
+                    font-size: 16px !important;
+                    padding: 12px 20px !important;
+                    border-radius: 5px !important;
+                    font-weight: bold !important;
+                    cursor: pointer !important;
+                    border: none !important;
+                }
 
-    // 2️⃣ **Continuously Hide Any Existing Dialog Box**
-    function hideExistingDialogs() {
-        let dialog = document.querySelector(".a-dialog");
-        if (dialog) {
-            dialog.style.display = "none"; // Hide instead of removing
-            console.log("🚀 A-Frame Dialog is Now Hidden!");
+                /* Styling the Deny button */
+                .a-dialog button:nth-child(1) {
+                    background-color: ##D3D3D3 !important;
+                    color: white !important;
+                }
+
+                /* Styling the Allow button */
+                .a-dialog button:nth-child(2) {
+                    background-color: #006A4B !important; 
+                    color: white !important;
+                }
+            `;
+
+            // Append the style to the document
+            document.head.appendChild(style);
         }
-    }
+    }, 500); // Check every 500ms
+}
 
-    setInterval(hideExistingDialogs, 100); // Check every 100ms to keep it hidden
-
-    // 3️⃣ **Auto-Allow Motion Sensors Without User Interaction**
-    function enableMotionSensors() {
-        if (typeof DeviceMotionEvent !== "undefined" && typeof DeviceMotionEvent.requestPermission === "function") {
-            DeviceMotionEvent.requestPermission()
-                .then((response) => {
-                    if (response === "granted") {
-                        console.log("✅ Motion Sensor Access Granted Automatically");
-                    } else {
-                        console.warn("❌ Motion Sensor Access Denied");
-                    }
-                })
-                .catch(console.error);
-        } else {
-            console.log("✅ Motion Sensors Do Not Require Permission on This Device");
-        }
-    }
-
-    // 4️⃣ **Ensure Everything Runs on Page Load**
-    window.onload = () => {
-        setTimeout(() => {
-            enableMotionSensors(); // Ensure motion sensors work
-            hideExistingDialogs(); // Ensure no dialog appears
-        }, 500);
-    };
-
-})();
+// Run after page load to ensure elements are available
+window.onload = overrideImmersiveDialogStyles;
 
   </script>
   <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
