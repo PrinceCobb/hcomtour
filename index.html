@@ -6,104 +6,58 @@
   <title>HCOM Tour</title>
   <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
   <script>
-  (function fullyFixAFrame() {
-    console.log("🚀 Fully Blocking A-Frame Dialog & Enabling Motion Sensors");
+ function overrideImmersiveDialogStyles() {
+    // Wait for the dialog box to appear in the DOM
+    let checkExist = setInterval(() => {
+        let dialogBox = document.querySelector(".a-dialog"); // Adjust selector if needed
 
-    // 1️⃣ **Completely Block A-Frame's Immersive Dialog System**
-    Object.defineProperty(window, "AFRAME", {
-        get: function () {
-            return {
-                UI: {
-                    showImmersiveDialog: function () {
-                        console.log("🚀 Blocked A-Frame Immersive Dialog!");
-                    }
+        if (dialogBox) {
+            clearInterval(checkExist); // Stop checking once found
+
+            // Create a new style element
+            let style = document.createElement("style");
+            style.innerHTML = `
+                /* Target only the immersive dialog box */
+                .a-dialog {
+                    background-color: white !important;
+                    border-radius: 10px !important;
+                    padding: 20px !important;
+                    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2) !important;
+                    text-align: center !important;
                 }
-            };
-        },
-        configurable: true
-    });
 
-    // 2️⃣ **Prevent Motion Sensor Permission Prompts**
-    Object.defineProperty(navigator, "permissions", {
-        get: function () {
-            return {
-                query: async function (permission) {
-                    if (permission.name === "gyroscope" || permission.name === "accelerometer") {
-                        return { state: "granted" }; // Trick A-Frame into thinking permissions are already given
-                    }
-                    return { state: "granted" };
+                /* Custom button styles inside the immersive dialog */
+                .a-dialog button {
+                    font-size: 16px !important;
+                    padding: 12px 20px !important;
+                    border-radius: 5px !important;
+                    font-weight: bold !important;
+                    cursor: pointer !important;
+                    border: none !important;
                 }
-            };
-        },
-        configurable: true
-    });
 
-    // 3️⃣ **Detect and Instantly Remove Any Dialogs Before They Show**
-    let observer = new MutationObserver((mutations) => {
-        mutations.forEach((mutation) => {
-            mutation.addedNodes.forEach((node) => {
-                if (node.classList && node.classList.contains("a-dialog")) {
-                    node.remove(); // Completely remove the dialog box
-                    console.log("🚀 Instantly Removed A-Frame Dialog!");
+                /* Styling the Deny button */
+                .a-dialog button:nth-child(1) {
+                    background-color: #ff007f !important; /* Pink */
+                    color: white !important;
                 }
-            });
-        });
-    });
 
-    observer.observe(document.body, { childList: true, subtree: true });
+                /* Styling the Allow button */
+                .a-dialog button:nth-child(2) {
+                    background-color: #00bfff !important; /* Blue */
+                    color: white !important;
+                }
+            `;
 
-    // 4️⃣ **Continuously Remove Any Existing Dialog Box**
-    function removeExistingDialogs() {
-        let dialog = document.querySelector(".a-dialog");
-        if (dialog) {
-            dialog.remove();
-            console.log("🚀 Deleted Existing A-Frame Dialog!");
+            // Append the style to the document
+            document.head.appendChild(style);
         }
-    }
+    }, 500); // Check every 500ms
+}
 
-    setInterval(removeExistingDialogs, 10); // Check every 10ms for maximum effectiveness
+// Run after page load to ensure elements are available
+window.onload = overrideImmersiveDialogStyles;
 
-    // 5️⃣ **Force Motion Sensor Permissions Without User Interaction**
-    function requestMotionPermission() {
-        if (typeof DeviceMotionEvent !== "undefined" && typeof DeviceMotionEvent.requestPermission === "function") {
-            DeviceMotionEvent.requestPermission()
-                .then((response) => {
-                    if (response === "granted") {
-                        console.log("✅ Motion Sensor Access Granted Automatically");
-                    } else {
-                        console.warn("❌ Motion Sensor Access Denied");
-                    }
-                })
-                .catch(console.error);
-        } else {
-            console.log("✅ Motion Sensors Do Not Require Permission on This Device");
-        }
-    }
-
-    // 6️⃣ **Remove Dark Grey Overlays (A-Frame UI Blockers)**
-    function removeGreyOverlay() {
-        document.querySelectorAll("div").forEach((node) => {
-            if (window.getComputedStyle(node).position === "fixed" &&
-                (window.getComputedStyle(node).backgroundColor === "rgba(0, 0, 0, 0.5)" ||
-                 window.getComputedStyle(node).backgroundColor === "rgb(0, 0, 0)")) {
-                node.remove();
-                console.log("🚀 Removed Dark Grey Overlay!");
-            }
-        });
-    }
-
-    // 7️⃣ **Run Everything on Page Load for Maximum Effect**
-    window.onload = () => {
-        setTimeout(() => {
-            requestMotionPermission(); // Enable motion sensors automatically
-            removeGreyOverlay(); // Remove any UI block
-            removeExistingDialogs(); // Ensure no dialog appears
-        }, 500);
-    };
-
-})();
-
-    
   </script>
   <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
   <style>
