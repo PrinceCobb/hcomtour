@@ -328,7 +328,7 @@ allVideos.forEach((video) => {
   });
 });
    
-    // Ensure video does not load until user clicks "Start Experience"
+     // Ensure video does not load until user clicks "Start Experience"
     document.addEventListener("DOMContentLoaded", () => {
         introVideo.removeAttribute("src"); // Prevent auto-loading
         introVideo.load();
@@ -340,11 +340,8 @@ allVideos.forEach((video) => {
         playButton.style.display = "none"; // Hide button
 
         // Make A-Frame scene visible
-        scene.style.visibility = "visible";
+        scene.style.display = "block"; // Show the scene only after button click
         videoSky.setAttribute("visible", "true");
-
-        // Set background to black (smooth transition from white)
-        document.body.style.backgroundColor = "white";
 
         // Load and play video
         const videoUrl = "https://m2qall8jajdg-hls-push.5centscdn.com/mp4/comp/intro-test.mp4";
@@ -361,7 +358,6 @@ allVideos.forEach((video) => {
         // Assign video to A-Frame videosphere
         videoSky.setAttribute("src", "#intro-video");
     });
-
    
 //  Disable cursor interactions at the start
 cursor.setAttribute("raycaster", "objects: none"); 
