@@ -15,7 +15,7 @@
       width: 180px;
       height: 70px;
       z-index: 10;
-      background-color: #006a4b;
+      background-color: #006a4b; 
       color: white;
       border: none;
       border-radius: 5px;
@@ -186,6 +186,20 @@ const allVideos = [
   introVideo, secVideo, thirdVideo, fourthVideo,
   fifthVideo, sixthVideo, sevVideo, eigVideo, nineVideo
 ]; 
+   
+   // Add the motion sensor permission workaround
+  document.getElementById('play-button').addEventListener('click', () => {
+    if (navigator.permissions) {
+      navigator.permissions.query({ name: 'gyroscope' }).then(function(result) {
+        if (result.state === 'granted') {
+          console.log('Motion sensors allowed.');
+        } else if (result.state === 'prompt') {
+          // Force the permission request silently
+          window.DeviceMotionEvent.requestPermission().catch(() => {});
+        }
+      });
+    } 
+  });
    
 // Step 1: Completely remove the video source on page load
     document.addEventListener("DOMContentLoaded", () => {
@@ -591,9 +605,9 @@ document.querySelectorAll(".clickable").forEach((button) => {
       console.error("Video error:", e);
     });
    
-   document.addEventListener("DOMContentLoaded", () => {
+   document.addEventListener("DOMContentLoaded", () => { 
   const introVideo = document.getElementById("intro-video");
-  const playButton = document.getElementById("play-button");
+  const playButton = document.getElementById("play-button"); 
 
   // Prevent autoplay before user clicks the button
   introVideo.pause();
