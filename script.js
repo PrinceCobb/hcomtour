@@ -69,55 +69,37 @@ const videoUrlsMap = {
     "https://m2qall8jajdg-hls-push.5centscdn.com/mp4/comp/Admissionnw.mp4",
 };
 
-// State variables
-let lastPlayedVideo = null;
-let introVideoPauseTime = 0;
+/**
+ * @type {HTMLVideoElement}
+ */
+let currentVideo = null;
+const introPlayButton = document.getElementById(playButtonIdsMap[SCENES.INTRO]);
 
 // Get all video elements
 const videoElements = Object.values(videoIdsMap).map((id) =>
   document.getElementById(id)
 );
-const introVideo = document.getElementById(videoIdsMap[SCENES.INTRO]);
 
 // Initialize controls
 elements.playPauseButton.style.display = "none";
 elements.videoControls.style.display = "none";
 elements.skipButton.style.display = "none";
-elements.menu.classList.add("hidden");
+elements.menu.setAttribute("visible", false);
+elements.homebtn.setAttribute("visible", false);
 elements.cursor.setAttribute("raycaster", "objects: none");
-
-// Helper Functions
-function getCurrentPlayingVideo() {
-  return (
-    videoElements.find((video) => !video.paused && video.readyState >= 3) ||
-    lastPlayedVideo
-  );
-}
-
-function updateTimeline() {
-  const currentVideo = getCurrentPlayingVideo();
-  if (currentVideo?.duration) {
-    elements.videoTimeline.max = currentVideo.duration;
-    elements.videoTimeline.value = currentVideo.currentTime;
-  }
-}
 
 function showMenu() {
   elements.menu.setAttribute("visible", true);
-  elements.menu.classList.remove("hidden");
   elements.cursor.setAttribute("raycaster", "objects: .clickable");
 }
 
 function showHomeButton() {
-  elements.menu.classList.add("hidden");
   elements.homebtn.setAttribute("visible", true);
-  elements.homebtn.classList.remove("hidden");
   elements.cursor.setAttribute("raycaster", "objects: .clickable");
 }
 
 // Video Control Functions
 function togglePlayPause() {
-  const currentVideo = getCurrentPlayingVideo();
   if (!currentVideo) return;
 
   if (currentVideo.paused) {
@@ -126,12 +108,25 @@ function togglePlayPause() {
       .play()
       .then(() => {
         elements.playPauseButton.textContent = "II";
-        lastPlayedVideo = currentVideo;
       })
       .catch((error) => console.error("Playback failed:", error));
   } else {
     currentVideo.pause();
     elements.playPauseButton.textContent = "▶";
+  }
+}
+
+function skipToAlmostEnd() {
+  if (currentVideo && currentVideo.readyState >= 3) {
+    currentVideo.currentTime = currentVideo.duration - 2;
+    currentVideo.play();
+    elements.skipButton.style.display = "none";
+  }
+}
+
+function skipToEnd() {
+  if (currentVideo) {
+    currentVideo.currentTime = currentVideo.duration;
   }
 }
 
@@ -147,16 +142,18 @@ function switchVideo(key, videoId) {
     newVideo.src = videoUrlsMap[key];
   }
   newVideo.play().catch((e) => console.error(e));
+  currentVideo = newVideo;
 
   elements.menu.setAttribute("visible", false);
-  elements.menu.classList.add("hidden");
   elements.homebtn.setAttribute("visible", false);
-  elements.homebtn.classList.add("hidden");
   elements.cursor.setAttribute("raycaster", "objects: none");
 
   if (videoId === videoIdsMap[SCENES.INTRO]) {
-    elements.homebtn.setAttribute("visible", false);
-    elements.homebtn.classList.add("hidden");
+    elements.skipButton.style.display = "block";
+    introPlayButton.style.display = "none";
+  } else {
+    // hide skip button
+    elements.skipButton.style.display = "none";
   }
 }
 
@@ -167,6 +164,9 @@ function setupVideoListeners(video) {
     elements.playPauseButton.style.display = "flex";
     elements.playPauseButton.textContent = "II";
     elements.videoControls.style.display = "flex";
+    if (currentVideo && currentVideo.id === videoIdsMap[SCENES.INTRO]) {
+      elements.skipButton.style.display = "block";
+    }
   });
 
   video.addEventListener("pause", () => {
@@ -176,6 +176,7 @@ function setupVideoListeners(video) {
   video.addEventListener("ended", () => {
     elements.playPauseButton.style.display = "none";
     elements.videoControls.style.display = "none";
+    elements.skipButton.style.display = "none";
 
     if (video.id === videoIdsMap[SCENES.INTRO]) {
       showMenu();
@@ -184,7 +185,12 @@ function setupVideoListeners(video) {
     }
   });
 
-  video.addEventListener("timeupdate", updateTimeline);
+  video.addEventListener("timeupdate", () => {
+    if (currentVideo?.duration) {
+      elements.videoTimeline.max = currentVideo.duration;
+      elements.videoTimeline.value = currentVideo.currentTime;
+    }
+  });
 
   // Error handling
   video.addEventListener("waiting", () =>
@@ -217,80 +223,22 @@ document.addEventListener("DOMContentLoaded", () => {
     setupVideoListeners(video);
   });
 
-  // Intro video setup
-  introVideo.load();
-  introVideo.pause();
-  introVideo.currentTime = 0;
-  introVideo.muted = true;
-
   // Button click handlers
   elements.playPauseButton.addEventListener("click", togglePlayPause);
 
   elements.videoTimeline.addEventListener("change", () => {
-    const currentVideo = getCurrentPlayingVideo();
     if (currentVideo) {
       currentVideo.currentTime = elements.videoTimeline.value;
     }
   });
 
-  // Setup intro play button
-  const introPlayButton = document.getElementById(
-    playButtonIdsMap[SCENES.INTRO]
-  );
-  introPlayButton.addEventListener("click", () => {
-    introPlayButton.style.display = "none";
-    elements.scene.style.visibility = "visible";
-    elements.skipButton.style.display = "block";
-
-    introVideo.src = videoUrlsMap[SCENES.INTRO];
-    introVideo.muted = false;
-    introVideo
-      .play()
-      .then(() => console.log("Intro video started."))
-      .catch((error) => console.error("Playback Error:", error));
-  });
-
   // Setup skip button
-  elements.skipButton.addEventListener("click", () => {
-    if (introVideo.readyState >= 3) {
-      introVideo.currentTime = introVideo.duration - 2;
-      introVideo.play();
-      elements.skipButton.style.display = "none";
-    }
-  });
+  elements.skipButton.addEventListener("click", skipToAlmostEnd);
 
   // Setup home button
   elements.homebtn.addEventListener("click", () => {
-    introVideo.pause();
-    introVideo.load();
-    elements.videoSphere.setAttribute("src", `#${videoIdsMap[SCENES.INTRO]}`);
-    // Reset video elements except intro video
-    videoElements
-      .filter((video) => video !== introVideo)
-      .forEach((video) => {
-        video.src = "";
-        video.load();
-      });
-
-    function seekAndPauseIntro() {
-      if (!isNaN(introVideo.duration) && introVideo.duration > 4) {
-        introVideo.currentTime = introVideo.duration - 4;
-        introVideo.pause();
-      }
-    }
-
-    if (introVideo.readyState >= 2) {
-      seekAndPauseIntro();
-    } else {
-      introVideo.addEventListener("loadedmetadata", seekAndPauseIntro, {
-        once: true,
-      });
-    }
-
-    elements.homebtn.setAttribute("visible", false);
-    elements.homebtn.classList.add("hidden");
-    elements.homebtn.style.display = "none";
-    showMenu();
+    switchVideo(SCENES.INTRO, videoIdsMap[SCENES.INTRO]);
+    skipToEnd();
   });
 
   // Setup video buttons
@@ -311,25 +259,5 @@ document.addEventListener("DOMContentLoaded", () => {
       button.setAttribute("scale", "1 1 1");
       button.setAttribute("material", "color: #FFFFFF");
     });
-  });
-
-  // Mobile touch handler
-  document.body.addEventListener(
-    "touchstart",
-    () => {
-      if (introVideo.paused) {
-        introVideo
-          .play()
-          .catch((e) => console.error("iOS Touch Play Error:", e));
-      }
-    },
-    { once: true }
-  );
-
-  // Show menu near end of intro video
-  introVideo.addEventListener("timeupdate", () => {
-    if (introVideo.duration - introVideo.currentTime <= 5) {
-      showMenu();
-    }
   });
 });
