@@ -1,4 +1,3 @@
-
 const scene = document.getElementById("scene");
 
 const menu = document.getElementById("menubtn");
@@ -31,6 +30,9 @@ const videoIdsMap = {
   study: "scene-seven-video",
   fitness: "scene-eight-video",
   admin: "scene-nine-video",
+};
+const videoUrlsMap = {
+  intro: "https://m2qall8jajdg-hls-push.5centscdn.com/mp4/comp/intro-test.mp4"
 };
 
 const videoKeys = Object.keys(videoIdsMap);
@@ -153,25 +155,36 @@ document.addEventListener("DOMContentLoaded", () => {
     scene.style.visibility = "visible"; // Show A-Frame scene
     skipButton.style.display = "block"; // Show Skip button
 
-    // 🚀 Load HLS ONLY when the user clicks "Start Experience"
-    if (Hls.isSupported()) {
-      const hls = new Hls();
-      hls.loadSource(hlsUrl);
-      hls.attachMedia(introVideo);
-      hls.on(Hls.Events.MANIFEST_PARSED, () => {
-        console.log("HLS manifest loaded, ready to play intro video.");
-        introVideo.muted = false; // Ensure it's not muted
-        introVideo.play().catch((e) => console.error("Playback Error:", e));
+    introVideo.src = videoUrlsMap.intro;
+    introVideo.muted = false; // Ensure it's not muted
+    introVideo
+      .play()
+      .then(() => {
+        console.log("Intro video started.");
+      })
+      .catch((error) => {
+        console.error("Playback Error:", error);
       });
-      console.log("Experience started, playing intro video.");
-    } else if (introVideo.canPlayType("application/vnd.apple.mpegurl")) {
-      introVideo.src = hlsUrl;
-      introVideo.muted = false;
-      introVideo.play().catch((e) => console.error("Playback Error:", e));
-      console.log("Experience started, playing intro video.");
-    } else {
-      console.error("HLS not supported on this browser.");
-    }
+
+    // // 🚀 Load HLS ONLY when the user clicks "Start Experience"
+    // if (Hls.isSupported()) {
+    //   const hls = new Hls();
+    //   hls.loadSource(hlsUrl);
+    //   hls.attachMedia(introVideo);
+    //   hls.on(Hls.Events.MANIFEST_PARSED, () => {
+    //     console.log("HLS manifest loaded, ready to play intro video.");
+    //     introVideo.muted = false; // Ensure it's not muted
+    //     introVideo.play().catch((e) => console.error("Playback Error:", e));
+    //   });
+    //   console.log("Experience started, playing intro video.");
+    // } else if (introVideo.canPlayType("application/vnd.apple.mpegurl")) {
+    //   introVideo.src = hlsUrl;
+    //   introVideo.muted = false;
+    //   introVideo.play().catch((e) => console.error("Playback Error:", e));
+    //   console.log("Experience started, playing intro video.");
+    // } else {
+    //   console.error("HLS not supported on this browser.");
+    // }
   });
 
   // 🚀 Show Menu 5 Seconds Before the Intro Video Ends
