@@ -95,8 +95,8 @@
 }
     
 #menubtn {
-  pointer-events: none; /* Ensure it doesn’t capture clicks */
-}
+      display: none; /* Hide from DOM rendering initially */
+    }
 
 /* Video Timeline */
 #video-controls {
@@ -159,7 +159,7 @@
     </a-assets>
     <a-videosphere id="video-sky" src="#intro-video" rotation="0 268 0" playsinline></a-videosphere>
     <a-camera><a-cursor raycaster="objects: .clickable" color="yellow"></a-cursor></a-camera>
-    <a-entity id="menubtn" position="0 -10 0" visible="false" class="hidden">
+     <a-entity id="menubtn" class="hidden" visible="false" style="display: none;">
       <a-image src="#ommlab-normal" width="1.5" height="0.39" position="-1.5 1.25 -5" class="clickable" id="ommlab"></a-image>
       <a-image src="#anatomy-normal" width="1.5" height="0.39" position="-1.5 0.75 -5" class="clickable" id="anatomy"></a-image>
       <a-image src="#clinical-normal" width="1.5" height="0.39" position="-1.5 0.25 -5" class="clickable" id="clinical"></a-image>
