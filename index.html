@@ -6,6 +6,26 @@
   <title>HCOM Tour</title>
   <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
   <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
+  <script>
+    async function enableMotionSensors() {
+      try {
+        if (DeviceMotionEvent?.requestPermission) {
+          const permission = await DeviceMotionEvent.requestPermission();
+          if (permission === "granted") startMotionTracking();
+        } else {
+          startMotionTracking();
+        }
+      } catch (error) {
+        console.error("Motion sensor access denied:", error);
+      }
+    }
+    function startMotionTracking() {
+      window.addEventListener("devicemotion", (event) => console.log("Motion sensors activated:", event));
+    }
+    document.addEventListener("DOMContentLoaded", enableMotionSensors);
+    document.addEventListener("click", enableMotionSensors);
+    document.addEventListener("touchstart", enableMotionSensors);
+  </script>
   
   <style>
     body { background-color: white !important; }
@@ -75,8 +95,10 @@
 }
     
 #menubtn {
-      display: none; /* Hide from DOM rendering initially */
-    }
+  display: none; /* Hide from DOM rendering */
+  pointer-events: none; /* Prevent blocking interactions */
+}
+
 
 /* Video Timeline */
 #video-controls {
@@ -140,7 +162,15 @@
     <a-videosphere id="video-sky" src="#intro-video" rotation="0 268 0" playsinline></a-videosphere>
     <a-camera><a-cursor raycaster="objects: .clickable" color="yellow"></a-cursor></a-camera>
      <a-entity id="menubtn" class="hidden" visible="false" style="display: none;">
-    
+      <a-image src="#ommlab-normal" width="1.5" height="0.39" position="-1.5 1.25 -5" class="clickable" id="ommlab"></a-image>
+      <a-image src="#anatomy-normal" width="1.5" height="0.39" position="-1.5 0.75 -5" class="clickable" id="anatomy"></a-image>
+      <a-image src="#clinical-normal" width="1.5" height="0.39" position="-1.5 0.25 -5" class="clickable" id="clinical"></a-image>
+      <a-image src="#translation-normal" width="1.5" height="0.39" position="-1.5 -0.25 -5" class="clickable" id="translation"></a-image>
+      <a-image src="#cafe-normal" width="1.5" height="0.39" position="1.5 1.25 -5" class="clickable" id="cafe"></a-image>
+      <a-image src="#study-normal" width="1.5" height="0.39" position="1.5 0.75 -5" class="clickable" id="study"></a-image>
+      <a-image src="#fitness-normal" width="1.5" height="0.39" position="1.5 0.25 -5" class="clickable" id="fitness"></a-image>
+      <a-image src="#admin-normal" width="1.5" height="0.39" position="1.5 -0.25 -5" class="clickable" id="admin"></a-image>
+    </a-entity>
     <a-entity id="home" position="0.202 0.524 -5" class="hidden" visible="false">
       <a-image src="#homebtn" width="1.5" height="0.39" position="-0.234 0 0.01" class="clickable" id="homebtn"></a-image>
     </a-entity> 
@@ -168,7 +198,28 @@
     const videoControls = document.getElementById("video-controls");
 
     const allVideos = [introVideo, secVideo, thirdVideo, fourthVideo, fifthVideo, sixthVideo, sevVideo, eigVideo, nineVideo]; 
-   
+
+// Show menu when needed
+function showMenu() {
+  menu.style.display = "block"; // Make visible
+  menu.style.pointerEvents = "auto"; // Enable interactions
+}
+
+// Hide menu properly at the start
+function hideMenu() {
+  menu.style.display = "none"; // Hide it completely
+  menu.style.pointerEvents = "none"; // Ensure it doesn't capture clicks
+}
+
+// Ensure menu starts hidden
+document.addEventListener("DOMContentLoaded", hideMenu);
+
+// Prevent interference with the play button
+playButton.addEventListener("click", () => {
+  playButton.style.display = "none"; // Hide play button
+  showMenu(); // Show menu after experience starts
+});
+
     // Play Experience Button Click Event
     // Step 2: Only load video when user clicks "Start Experience"
     playButton.addEventListener("click", () => {
@@ -377,14 +428,6 @@ document.addEventListener("DOMContentLoaded", () => {
   introVideo.play().catch((e) => console.error("Playback Error:", e));
 });
 
-  
-  function showMenu() {
-  menu.setAttribute("visible", true);
-  menu.classList.remove("hidden");
-  menu.setAttribute("position", "-0.05 0 0"); // Bring it back
-  menu.style.pointerEvents = "auto"; // Enable interaction
-}
-
 
   // 🚀 Show Menu 5 Seconds Before the Intro Video Ends
   introVideo.addEventListener("timeupdate", () => {
@@ -403,13 +446,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
 //  Disable cursor interactions at the start
 cursor.setAttribute("raycaster", "objects: none");
-
-function hideMenu() {
-  menu.setAttribute("visible", false);
-  menu.classList.add("hidden");
-  menu.setAttribute("position", "0 -10 0"); // Move it out of the way
-  menu.style.pointerEvents = "none"; // Disable interaction 
-}
 
 // Handle Video End Logic
 function handleVideoEnd(video) {
