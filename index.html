@@ -7,30 +7,53 @@
   <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
   <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
   <script>
-    async function enableMotionSensors() {
-      try {
-        if (DeviceMotionEvent?.requestPermission) {
-          const permission = await DeviceMotionEvent.requestPermission();
-          if (permission === "granted") startMotionTracking();
-        } else {
-          startMotionTracking();
-        }
-      } catch (error) {
-        console.error("Motion sensor access denied:", error);
-      }
+  function requestMotionSensors() {
+    if (
+      typeof DeviceMotionEvent !== "undefined" &&
+      typeof DeviceMotionEvent.requestPermission === "function"
+    ) {
+      // iOS 13+ requires user gesture to request motion permission
+      DeviceMotionEvent.requestPermission()
+        .then((permissionState) => {
+          if (permissionState === "granted") {
+            console.log("Motion sensor access granted.");
+          } else {
+            console.warn("Motion sensor access denied.");
+          }
+        })
+        .catch(console.error);
     }
-    function startMotionTracking() {
-      window.addEventListener("devicemotion", (event) => console.log("Motion sensors activated:", event));
+
+    if (
+      typeof DeviceOrientationEvent !== "undefined" &&
+      typeof DeviceOrientationEvent.requestPermission === "function"
+    ) {
+      // Request Device Orientation Permission
+      DeviceOrientationEvent.requestPermission()
+        .then((permissionState) => {
+          if (permissionState === "granted") {
+            console.log("Orientation sensor access granted.");
+          } else {
+            console.warn("Orientation sensor access denied.");
+          }
+        })
+        .catch(console.error);
     }
-    document.addEventListener("DOMContentLoaded", enableMotionSensors);
-    document.addEventListener("click", enableMotionSensors);
-    document.addEventListener("touchstart", enableMotionSensors);
-  </script>
-  
+  }
+
+  document.addEventListener("DOMContentLoaded", () => {
+    const playButton = document.getElementById("play-button");
+    
+    playButton.addEventListener("click", () => {
+      requestMotionSensors();
+      playButton.style.display = "none"; // Hide button after allowing sensors
+      document.getElementById("scene").style.visibility = "visible"; // Load A-Frame scene
+    });
+  });
+</script>
+
   <style>
-    body { background-color: white !important; }
-    .a-dialog-overlay, .a-dialog, .hidden { display: none !important; pointer-events: none; }
-      #play-button {
+    #play-button {
       position: absolute;
       top: calc(50% - 25px);
       left: calc(50% - 50px - 45px);
@@ -45,7 +68,6 @@
       font-weight: 500;
       font-family: 'Barlow', sans-serif;
       cursor: pointer;
-      z-index: 1000;
     }
     .hidden {
       display: none;
@@ -68,7 +90,7 @@
   background: rgba(0, 0, 0, 0.0);
   padding: 10px;
   border-radius: 10px;
-  z-index: 900;
+  z-index: 999;
 }
 
 /* Play/Pause Button */
@@ -93,12 +115,6 @@
   height: 30px;
   cursor: pointer;
 }
-    
-#menubtn {
-  display: none; /* Hide from DOM rendering */
-  pointer-events: none; /* Prevent blocking interactions */
-}
-
 
 /* Video Timeline */
 #video-controls {
@@ -126,20 +142,29 @@
   cursor: pointer;
 }
 
+
   </style>
 </head>
 <body>
 
+  <!-- Start Experience Button -->
   <button id="play-button">Start Experience</button>
+
+  <!-- Control Frame (Play/Pause, Skip, Timeline) - PLACE IT HERE -->
   <div id="control-frame">
     <button id="play-pause-button">▶</button>
-    <div id="video-controls"><input type="range" id="video-timeline" min="0" value="0" step="0.1"></div>
-    <img id="skip-button" src="https://m2qall8jajdg-hls-push.5centscdn.com/btn/skipintro.png"/>
+   
+    <div id="video-controls">
+      <input type="range" id="video-timeline" min="0" value="0" step="0.1">
+    </div>
+     <img id="skip-button" src="https://m2qall8jajdg-hls-push.5centscdn.com/btn/skipintro.png"/>
   </div>
 
   <a-scene id="scene" loading-screen="enabled:false">
     <a-assets>
-      <video id="intro-video" crossorigin="anonymous" playsinline preload="none"></video>
+      <video id="intro-video" crossorigin="anonymous" playsinline preload="none"></video> 
+      <!-- <video id="intro-video" src="introx2.mp4" crossorigin="anonymous" playsinline muted preload="auto"></video> -->
+      <!-- <video id="intro-video" src="http://m2qall8jajdg-hls-push.5centscdn.com/mp4/webm/intro.mp4" crossorigin="anonymous" playsinline muted preload="auto"></video> -->
       <video id="scene-two-video" src="https://m2qall8jajdg-hls-push.5centscdn.com/mp4/comp/OMM.mp4" crossorigin="anonymous" playsinline muted preload="auto"></video>
       <video id="scene-three-video" src="https://m2qall8jajdg-hls-push.5centscdn.com/mp4/comp/Anatomy.mp4" crossorigin="anonymous" playsinline muted preload="auto"></video>
       <video id="scene-four-video" src="https://m2qall8jajdg-hls-push.5centscdn.com/mp4/comp/CTAC.mp4" crossorigin="anonymous" playsinline muted preload="auto"></video>
@@ -159,9 +184,11 @@
       <img id="homebtn" src="https://m2qall8jajdg-hls-push.5centscdn.com/btn/shwoptns.png" crossorigin="anonymous" />
       <img id="optionsbtn" src="https://m2qall8jajdg-hls-push.5centscdn.com/btn/showoptionsbtn2.png" crossorigin="anonymous" />
     </a-assets>
-    <a-videosphere id="video-sky" src="#intro-video" rotation="0 268 0" playsinline></a-videosphere>
-    <a-camera><a-cursor raycaster="objects: .clickable" color="yellow"></a-cursor></a-camera>
-     <a-entity id="menubtn" class="hidden" visible="false" style="display: none;">
+   <a-videosphere id="video-sky" src="#intro-video" rotation="0 268 0" playsinline></a-videosphere>
+    <a-camera>
+      <a-cursor raycaster="objects: .clickable" color="yellow"></a-cursor>
+    </a-camera>
+    <a-entity id="menubtn" position="-0.05 0 0" class="hidden" visible="false">
       <a-image src="#ommlab-normal" width="1.5" height="0.39" position="-1.5 1.25 -5" class="clickable" id="ommlab"></a-image>
       <a-image src="#anatomy-normal" width="1.5" height="0.39" position="-1.5 0.75 -5" class="clickable" id="anatomy"></a-image>
       <a-image src="#clinical-normal" width="1.5" height="0.39" position="-1.5 0.25 -5" class="clickable" id="clinical"></a-image>
@@ -173,122 +200,39 @@
     </a-entity>
     <a-entity id="home" position="0.202 0.524 -5" class="hidden" visible="false">
       <a-image src="#homebtn" width="1.5" height="0.39" position="-0.234 0 0.01" class="clickable" id="homebtn"></a-image>
-    </a-entity> 
+    </a-entity>
+     <!-- <a-entity id="options" position="1.238 -1 -5" class="hidden" visible="false">
+      <a-image src="#optionsbtn" width="1.5" height="0.39" position="-0.454 0 0.01" class="clickable" id="optionbtn"></a-image>
+    </a-entity> -->
   </a-scene> 
 
-  <script>
-    const playButton = document.getElementById("play-button");
-    const scene = document.getElementById("scene");
-    const introVideo = document.getElementById("intro-video");
-    const secVideo = document.getElementById("scene-two-video");
-    const thirdVideo = document.getElementById("scene-three-video");
-    const fourthVideo = document.getElementById("scene-four-video");
-    const fifthVideo = document.getElementById("scene-five-video");
-    const sixthVideo = document.getElementById("scene-six-video");
-    const sevVideo = document.getElementById("scene-seven-video");
-    const eigVideo = document.getElementById("scene-eight-video");
-    const nineVideo = document.getElementById("scene-nine-video");
-    const menu = document.getElementById("menubtn");
-    const videoSky = document.getElementById("video-sky");
-    const homebtn = document.getElementById("home");
-    const cursor = document.querySelector("a-cursor");
-    const skipButton = document.getElementById("skip-button");
-    const playPauseButton = document.getElementById("play-pause-button");
-    const videoTimeline = document.getElementById("video-timeline");
-    const videoControls = document.getElementById("video-controls");
+ <script>
+const playButton = document.getElementById("play-button");
+const scene = document.getElementById("scene");
+const introVideo = document.getElementById("intro-video");
+const secVideo = document.getElementById("scene-two-video");
+const thirdVideo = document.getElementById("scene-three-video");
+const fourthVideo = document.getElementById("scene-four-video");
+const fifthVideo = document.getElementById("scene-five-video");
+const sixthVideo = document.getElementById("scene-six-video");
+const sevVideo = document.getElementById("scene-seven-video");
+const eigVideo = document.getElementById("scene-eight-video");
+const nineVideo = document.getElementById("scene-nine-video");
+const menu = document.getElementById("menubtn");
+const videoSky = document.getElementById("video-sky");
+const homebtn = document.getElementById("home");
+const cursor = document.querySelector("a-cursor");
+const skipButton = document.getElementById("skip-button");
+const playPauseButton = document.getElementById("play-pause-button");
+const videoTimeline = document.getElementById("video-timeline");
+const videoControls = document.getElementById("video-controls");
 
-    const allVideos = [introVideo, secVideo, thirdVideo, fourthVideo, fifthVideo, sixthVideo, sevVideo, eigVideo, nineVideo]; 
-
-// Show menu when needed
-function showMenu() {
-  menu.style.display = "block"; // Make visible
-  menu.style.pointerEvents = "auto"; // Enable interactions
-}
-
-// Hide menu properly at the start
-function hideMenu() {
-  menu.style.display = "none"; // Hide it completely
-  menu.style.pointerEvents = "none"; // Ensure it doesn't capture clicks
-}
-
-// Ensure menu starts hidden
-document.addEventListener("DOMContentLoaded", hideMenu);
-
-// Prevent interference with the play button
-playButton.addEventListener("click", () => {
-  playButton.style.display = "none"; // Hide play button
-  showMenu(); // Show menu after experience starts
-});
-
-    // Play Experience Button Click Event
-    // Step 2: Only load video when user clicks "Start Experience"
-    playButton.addEventListener("click", () => {
-      playButton.style.display = "none"; // Hide Start Experience button
-      scene.style.visibility = "visible"; // Show A-Frame scene
-      skipButton.style.display = "block"; // Show Skip button
-
-      // Attach video source dynamically only when button is clicked
-      const videoUrl = "https://m2qall8jajdg-hls-push.5centscdn.com/mp4/comp/intro-test.mp4";
-
-      introVideo.src = videoUrl;
-      introVideo.muted = false; // Ensure sound is ON
-      introVideo.currentTime = 0; // Start from beginning
-      introVideo.pause(); // Ensure video is paused until explicitly played
-      console.log("Intro video loaded but still paused.");
-
-      // Set video to A-Frame videosphere
-      const videoSphere = document.getElementById("video-sky");
-      videoSphere.setAttribute("src", "#intro-video"); 
-
-
-      // Explicitly start video
-      introVideo.play().then(() => {
-        console.log("Intro video started with sound.");
-      }).catch((error) => {
-        console.error("Playback Error:", error);
-      });
-    });
-
-    document.addEventListener("DOMContentLoaded", () => {
-  const playButton = document.getElementById("play-button");
-  const skipButton = document.getElementById("skip-button");
-
-  // Initially hide Skip Intro button
-  skipButton.style.display = "none";
-
-  // Show Skip Intro button only when Start Experience is clicked
-  playButton.addEventListener("click", () => {
-    playButton.style.display = "none"; // Hide Start Experience button
-    skipButton.style.display = "block"; // Show Skip Intro button
-  });
- 
-  // Skip Intro functionality
-  skipButton.addEventListener("click", () => {
-    const introVideo = document.getElementById("intro-video");
-
-    if (introVideo.readyState >= 3) {
-      introVideo.currentTime = introVideo.duration - 2;
-      introVideo.play();
-      console.log("Intro skipped.");
-    } else {
-      console.error("Intro video is not ready.");
-    }
-
-   // Hide Skip Intro button immediately after skipping
-    skipButton.style.display = "none";
-  });
-
-  // **Ensure Skip Button Disappears When Intro Video Ends**
-  introVideo.addEventListener("ended", () => {
-    skipButton.style.display = "none"; // Hide Skip button on video end
-    console.log("Intro video ended, hiding Skip button.");
-  });
-});
+const allVideos = [
+  introVideo, secVideo, thirdVideo, fourthVideo,
+  fifthVideo, sixthVideo, sevVideo, eigVideo, nineVideo
+]; 
    
-//  Store last timestamp for `intro-video`
-let introVideoPauseTime = 0;
-
-    // Step 1: Completely remove the video source on page load
+// Step 1: Completely remove the video source on page load
     document.addEventListener("DOMContentLoaded", () => {
       introVideo.removeAttribute("src");  // Remove src
       introVideo.load();  // Force browser to clear any preloaded content
@@ -300,7 +244,7 @@ playPauseButton.style.display = "none";
 videoControls.style.display = "none";
 
    let lastPlayedVideo = null; // Track the last played video
-    
+
 // Function to get the currently playing video
 function getCurrentPlayingVideo() {
   return allVideos.find((video) => !video.paused && video.readyState >= 3) || lastPlayedVideo;
@@ -386,48 +330,38 @@ introVideo.currentTime = 0;
 introVideo.muted = true; // Keep muted until user interaction
 
 document.addEventListener("DOMContentLoaded", () => {
-    const introVideo = document.getElementById("intro-video");
-    const scene = document.getElementById("scene");
-    const playButton = document.getElementById("play-button");
+  const introVideo = document.getElementById("intro-video");
+  const hlsUrl = 'https://m2qall8jajdg-hls-push.5centscdn.com/mp4/comp/intro-test.mp4/playlist.m3u8';
 
-    // Hide the scene initially
-    scene.style.visibility = "hidden";
-
-    // Ensure the intro video doesn't load before interaction
-    introVideo.pause();
-    introVideo.currentTime = 0;
-    introVideo.removeAttribute("src");
-
-    // Ensure the play button is active
-    playButton.disabled = false;
-
+  //Stop browser from preloading or playing video
+  introVideo.pause();
+  introVideo.currentTime = 0; // Ensure it starts at 0
+  introVideo.removeAttribute("src"); // Prevents auto-loading
   menu.classList.add("hidden"); // Hide menu initially
 
-  playButton.addEventListener("click", async () => {
-  playButton.style.display = "none"; 
-  scene.style.visibility = "visible"; 
-  skipButton.style.display = "block";
+  playButton.addEventListener("click", () => {
+    playButton.style.display = "none"; // Hide Start Experience button
+    scene.style.visibility = "visible"; // Show A-Frame scene
+    skipButton.style.display = "block"; // Show Skip button
 
-  if (typeof DeviceMotionEvent.requestPermission === 'function') {
-    try {
-      const permissionState = await DeviceMotionEvent.requestPermission();
-      if (permissionState === 'granted') console.log('Device motion permission granted');
-    } catch (error) { console.error('Device motion permission denied', error); }
-  }
-
-  if (typeof DeviceOrientationEvent.requestPermission === 'function') {
-    try {
-      const permissionState = await DeviceOrientationEvent.requestPermission();
-      if (permissionState === 'granted') console.log('Device orientation permission granted');
-    } catch (error) { console.error('Device orientation permission denied', error); }
-  }
-
-  introVideo.src = "https://m2qall8jajdg-hls-push.5centscdn.com/mp4/comp/intro-test.mp4";
-  introVideo.muted = false;
-  introVideo.currentTime = 0;
-  introVideo.play().catch((e) => console.error("Playback Error:", e));
-});
-
+    // 🚀 Load HLS ONLY when the user clicks "Start Experience"
+    if (Hls.isSupported()) {
+      const hls = new Hls();
+      hls.loadSource(hlsUrl);
+      hls.attachMedia(introVideo);
+      hls.on(Hls.Events.MANIFEST_PARSED, () => {
+        console.log("HLS manifest loaded, ready to play intro video.");
+        introVideo.muted = false; // Ensure it's not muted
+        introVideo.play().catch((e) => console.error("Playback Error:", e));
+      });
+    } else if (introVideo.canPlayType("application/vnd.apple.mpegurl")) {
+      introVideo.src = hlsUrl;
+      introVideo.muted = false;
+      introVideo.play().catch((e) => console.error("Playback Error:", e));
+    } else {
+      console.error("HLS not supported on this browser.");
+    }
+  });
 
   // 🚀 Show Menu 5 Seconds Before the Intro Video Ends
   introVideo.addEventListener("timeupdate", () => {
@@ -446,6 +380,68 @@ document.addEventListener("DOMContentLoaded", () => {
 
 //  Disable cursor interactions at the start
 cursor.setAttribute("raycaster", "objects: none");
+
+// Play Experience Button Click Event
+    // Step 2: Only load video when user clicks "Start Experience"
+    playButton.addEventListener("click", () => {
+      playButton.style.display = "none"; // Hide Start Experience button
+      scene.style.visibility = "visible"; // Show A-Frame scene
+      skipButton.style.display = "block"; // Show Skip button
+
+      // Attach video source dynamically only when button is clicked
+      const videoUrl = "https://m2qall8jajdg-hls-push.5centscdn.com/mp4/comp/intro-test.mp4";
+
+      introVideo.src = videoUrl;
+      introVideo.muted = false; // Ensure sound is ON
+      introVideo.currentTime = 0; // Start from beginning
+      introVideo.pause(); // Ensure video is paused until explicitly played
+      console.log("Intro video loaded but still paused.");
+
+      // Set video to A-Frame videosphere
+      const videoSphere = document.getElementById("video-sky");
+      videoSphere.setAttribute("src", "#intro-video"); 
+
+
+      // Explicitly start video
+      introVideo.play().then(() => {
+        console.log("Intro video started with sound.");
+      }).catch((error) => {
+        console.error("Playback Error:", error);
+      });
+    });
+
+    document.addEventListener("DOMContentLoaded", () => {
+  const playButton = document.getElementById("play-button");
+  const skipButton = document.getElementById("skip-button");
+
+  // Initially hide Skip Intro button
+  skipButton.style.display = "none";
+
+  // Show Skip Intro button only when Start Experience is clicked
+  playButton.addEventListener("click", () => {
+    playButton.style.display = "none"; // Hide Start Experience button
+    skipButton.style.display = "block"; // Show Skip Intro button
+  });
+ 
+  // Skip Intro functionality
+  skipButton.addEventListener("click", () => {
+    const introVideo = document.getElementById("intro-video");
+
+    if (introVideo.readyState >= 3) {
+      introVideo.currentTime = introVideo.duration - 2;
+      introVideo.play();
+      console.log("Intro skipped.");
+    } else {
+      console.error("Intro video is not ready.");
+    }
+
+    // Hide Skip Intro button after skipping
+    skipButton.style.display = "none";
+  });
+});
+   
+//  Store last timestamp for `intro-video`
+let introVideoPauseTime = 0;
 
 // Handle Video End Logic
 function handleVideoEnd(video) {
@@ -629,7 +625,7 @@ document.querySelectorAll(".clickable").forEach((button) => {
       introVideo.play();
     });
 
-    // Step 4: Debugging - Catch errors 
+    // Step 4: Debugging - Catch errors
     introVideo.addEventListener("error", (e) => {
       console.error("Video error:", e);
     });
@@ -664,7 +660,11 @@ document.querySelectorAll(".clickable").forEach((button) => {
   }, { once: true }); // Runs only once
 
 });
+
+
   </script>
 
 </body>
 </html>
+
+
