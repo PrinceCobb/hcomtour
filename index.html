@@ -48,26 +48,16 @@
   <style>
      /* Hide A-Frame's Default Dialog & Dark Overlay */
     .a-dialog-overlay, .a-dialog {
-    display: none !important;
-    opacity: 0 !important;
-    visibility: hidden !important;
-}
+        display: none !important;
+    }
+
+    /* Remove any unwanted dark background */
+    body {
+        background-color: white !important;
     }
     
-    body, html {
-    background-color: white !important;
-}
-
-#scene {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-}
-
-#play-button {
-    z-index: 1000; /* Ensure button is on top */
+    #scene {
+  visibility: hidden;
 }
     
     #play-button {
@@ -177,7 +167,7 @@
      <img id="skip-button" src="https://m2qall8jajdg-hls-push.5centscdn.com/btn/skipintro.png"/>
   </div>
 
-  <a-scene id="scene" loading-screen="enabled: false">
+  <a-scene id="scene" loading-screen="enabled:false">
     <a-assets>
       <video id="intro-video" crossorigin="anonymous" playsinline preload="none"></video> 
       <!-- <video id="intro-video" src="introx2.mp4" crossorigin="anonymous" playsinline muted preload="auto"></video> -->
@@ -201,8 +191,8 @@
       <img id="homebtn" src="https://m2qall8jajdg-hls-push.5centscdn.com/btn/shwoptns.png" crossorigin="anonymous" />
       <img id="optionsbtn" src="https://m2qall8jajdg-hls-push.5centscdn.com/btn/showoptionsbtn2.png" crossorigin="anonymous" />
     </a-assets>
-   <a-videosphere id="video-sky" src="#intro-video" rotation="0 268 0" playsinline></a-videosphere>
-    <a-camera>
+   <a-videosphere id="video-sky" src="#intro-video" rotation="0 268 0" playsinline muted></a-videosphere>
+    <a-camera> 
       <a-cursor raycaster="objects: .clickable" color="yellow"></a-cursor>
     </a-camera>
     <a-entity id="menubtn" position="-0.05 0 0" class="hidden" visible="false">
@@ -248,7 +238,6 @@ const allVideos = [
   introVideo, secVideo, thirdVideo, fourthVideo,
   fifthVideo, sixthVideo, sevVideo, eigVideo, nineVideo
 ]; 
-    
    
 // Step 1: Completely remove the video source on page load
     document.addEventListener("DOMContentLoaded", () => {
@@ -342,41 +331,72 @@ allVideos.forEach((video) => {
   });
 });
    
-    // Ensure video does not load until user clicks "Start Experience"
-    document.addEventListener("DOMContentLoaded", () => {
-        introVideo.removeAttribute("src"); // Prevent auto-loading
-        introVideo.load();
-        console.log("Intro video source removed to prevent autoplay.");
-    });
+   // Ensure video does not autoplay on page load
+introVideo.pause();
+introVideo.currentTime = 0;
+introVideo.muted = true; // Keep muted until user interaction
 
-    // Handle "Start Experience" Click
-    playButton.addEventListener("click", () => {
-    playButton.style.display = "none"; // Hide button
-    scene.style.visibility = "visible"; // Show A-Frame scene
-    scene.style.display = "block";  // Ensure it's fully visible
-    videoSky.setAttribute("visible", "true");
+document.addEventListener("DOMContentLoaded", () => {
+    const introVideo = document.getElementById("intro-video");
+    const scene = document.getElementById("scene");
+    const playButton = document.getElementById("play-button");
 
-    document.body.style.backgroundColor = "white"; // Ensure no black fade-in 
+    // Hide the scene initially
+    scene.style.visibility = "hidden";
 
-        // Load and play video
-        const videoUrl = "https://m2qall8jajdg-hls-push.5centscdn.com/mp4/comp/intro-test.mp4";
-        introVideo.src = videoUrl;
-        introVideo.muted = false;
-        introVideo.currentTime = 0;
+    // Ensure the intro video doesn't load before interaction
+    introVideo.pause();
+    introVideo.currentTime = 0;
+    introVideo.removeAttribute("src");
 
-        introVideo.play().then(() => {
-            console.log("Intro video started successfully.");
-        }).catch((error) => {
-            console.error("Playback Error:", error);
-        });
+    // Ensure the play button is active
+    playButton.disabled = false;
 
-        // Assign video to A-Frame videosphere
-        videoSky.setAttribute("src", "#intro-video");
-    });
+  menu.classList.add("hidden"); // Hide menu initially
 
+  playButton.addEventListener("click", async () => {
+  playButton.style.display = "none"; 
+  scene.style.visibility = "visible"; 
+  skipButton.style.display = "block";
+
+  if (typeof DeviceMotionEvent.requestPermission === 'function') {
+    try {
+      const permissionState = await DeviceMotionEvent.requestPermission();
+      if (permissionState === 'granted') console.log('Device motion permission granted');
+    } catch (error) { console.error('Device motion permission denied', error); }
+  }
+
+  if (typeof DeviceOrientationEvent.requestPermission === 'function') {
+    try {
+      const permissionState = await DeviceOrientationEvent.requestPermission();
+      if (permissionState === 'granted') console.log('Device orientation permission granted');
+    } catch (error) { console.error('Device orientation permission denied', error); }
+  }
+
+  introVideo.src = "https://m2qall8jajdg-hls-push.5centscdn.com/mp4/comp/intro-test.mp4";
+  introVideo.muted = false;
+  introVideo.currentTime = 0;
+  introVideo.play().catch((e) => console.error("Playback Error:", e));
+});
+
+
+  // 🚀 Show Menu 5 Seconds Before the Intro Video Ends
+  introVideo.addEventListener("timeupdate", () => {
+    if (introVideo.duration - introVideo.currentTime <= 5) {
+      menu.setAttribute("visible", true);
+      menu.classList.remove("hidden");
+
+      // Enable cursor interactions for menu
+      cursor.setAttribute("raycaster", "objects: .clickable");
+
+      console.log("Menu displayed 5 seconds before the intro video ends.");
+    }
+  });
+});
    
+
 //  Disable cursor interactions at the start
-cursor.setAttribute("raycaster", "objects: none");  
+cursor.setAttribute("raycaster", "objects: none");
 
 // Play Experience Button Click Event
     // Step 2: Only load video when user clicks "Start Experience"
@@ -645,7 +665,7 @@ document.querySelectorAll(".clickable").forEach((button) => {
   playButton.addEventListener("click", () => {
     playButton.style.display = "none"; // Hide button after clicking
     introVideo.muted = false; // Unmute video after interaction
-    introVideo.removeAttribute("muted"); // Ensure browsers recognize change 
+    introVideo.removeAttribute("muted"); // Ensure browsers recognize change
     introVideo.currentTime = 0; // Restart from beginning
 
     introVideo.play().then(() => {
@@ -668,3 +688,5 @@ document.querySelectorAll(".clickable").forEach((button) => {
 
 </body>
 </html>
+
+
