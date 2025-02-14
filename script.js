@@ -1,353 +1,295 @@
-const scene = document.getElementById("scene");
+// Video Scene Keys
+const SCENES = {
+  INTRO: 'intro',
+  OMM_LAB: 'ommLab',
+  ANATOMY_LAB: 'anatomyLab',
+  CLINICAL_LAB: 'clinicalLab',
+  TRANSLATION_LAB: 'translationLab',
+  CAFE: 'cafe',
+  STUDY: 'study',
+  FITNESS: 'fitness',
+  ADMIN: 'admin'
+};
 
-const menu = document.getElementById("menubtn");
-const videoSphere = document.getElementById("main-video-sphere");
-const homebtn = document.getElementById("home");
-const cursor = document.querySelector("a-cursor");
-const skipButton = document.getElementById("skip-button");
-const playPauseButton = document.getElementById("play-pause-button");
-const videoTimeline = document.getElementById("video-timeline");
-const videoControls = document.getElementById("video-controls");
+// DOM Elements
+const elements = {
+  scene: document.getElementById("scene"),
+  menu: document.getElementById("menubtn"),
+  videoSphere: document.getElementById("main-video-sphere"),
+  homebtn: document.getElementById("home"),
+  cursor: document.querySelector("a-cursor"),
+  skipButton: document.getElementById("skip-button"),
+  playPauseButton: document.getElementById("play-pause-button"),
+  videoTimeline: document.getElementById("video-timeline"),
+  videoControls: document.getElementById("video-controls")
+};
 
+// Video and Button Mappings
 const playButtonIdsMap = {
-  intro: "intro-play-btn",
-  ommLab: "ommLab-btn",
-  anatomyLab: "anatomyLab-btn",
-  clinicalLab: "clinicalLab-btn",
-  translationLab: "translationLab-btn",
-  cafe: "cafe-btn",
-  study: "study-btn",
-  fitness: "fitness-btn",
-  admin: "admin-btn",
+  [SCENES.INTRO]: "intro-play-btn",
+  [SCENES.OMM_LAB]: "ommLab-btn",
+  [SCENES.ANATOMY_LAB]: "anatomyLab-btn",
+  [SCENES.CLINICAL_LAB]: "clinicalLab-btn",
+  [SCENES.TRANSLATION_LAB]: "translationLab-btn",
+  [SCENES.CAFE]: "cafe-btn",
+  [SCENES.STUDY]: "study-btn",
+  [SCENES.FITNESS]: "fitness-btn",
+  [SCENES.ADMIN]: "admin-btn"
 };
+
 const videoIdsMap = {
-  intro: "intro-video",
-  ommLab: "scene-two-video",
-  anatomyLab: "scene-three-video",
-  clinicalLab: "scene-four-video",
-  translationLab: "scene-five-video",
-  cafe: "scene-six-video",
-  study: "scene-seven-video",
-  fitness: "scene-eight-video",
-  admin: "scene-nine-video",
+  [SCENES.INTRO]: "intro-video",
+  [SCENES.OMM_LAB]: "scene-two-video",
+  [SCENES.ANATOMY_LAB]: "scene-three-video",
+  [SCENES.CLINICAL_LAB]: "scene-four-video",
+  [SCENES.TRANSLATION_LAB]: "scene-five-video",
+  [SCENES.CAFE]: "scene-six-video",
+  [SCENES.STUDY]: "scene-seven-video",
+  [SCENES.FITNESS]: "scene-eight-video",
+  [SCENES.ADMIN]: "scene-nine-video"
 };
+
 const videoUrlsMap = {
-  intro: "https://m2qall8jajdg-hls-push.5centscdn.com/mp4/comp/intro-test.mp4"
+  [SCENES.INTRO]: "https://m2qall8jajdg-hls-push.5centscdn.com/mp4/comp/intro-test.mp4",
+  [SCENES.OMM_LAB]: "https://m2qall8jajdg-hls-push.5centscdn.com/mp4/comp/OMM.mp4",
+  [SCENES.ANATOMY_LAB]: "https://m2qall8jajdg-hls-push.5centscdn.com/mp4/comp/Anatomy.mp4",
+  [SCENES.CLINICAL_LAB]: "https://m2qall8jajdg-hls-push.5centscdn.com/mp4/comp/CTAC.mp4",
+  [SCENES.TRANSLATION_LAB]: "",
+  [SCENES.CAFE]: "https://m2qall8jajdg-hls-push.5centscdn.com/mp4/comp/Student.mp4",
+  [SCENES.STUDY]: "https://m2qall8jajdg-hls-push.5centscdn.com/mp4/comp/Classrooms.mp4",
+  [SCENES.FITNESS]: "https://m2qall8jajdg-hls-push.5centscdn.com/mp4/comp/Fitness.mp4",
+  [SCENES.ADMIN]: "https://m2qall8jajdg-hls-push.5centscdn.com/mp4/comp/Admissionnw.mp4"
 };
 
-const videoKeys = Object.keys(videoIdsMap);
-const videoIds = Object.values(videoIdsMap);
+// State variables
+let lastPlayedVideo = null;
+let introVideoPauseTime = 0;
 
-const videoElements = Object.values(videoIdsMap).map((id) =>
-  document.getElementById(id)
-);
+// Get all video elements
+const videoElements = Object.values(videoIdsMap).map(id => document.getElementById(id));
+const introVideo = document.getElementById(videoIdsMap[SCENES.INTRO]);
 
-const introVideo = document.getElementById(videoIdsMap.intro);
-const introPlayButton = document.getElementById(playButtonIdsMap.intro);
+// Initialize controls
+elements.playPauseButton.style.display = "none";
+elements.videoControls.style.display = "none";
+elements.skipButton.style.display = "none";
+elements.menu.classList.add("hidden");
+elements.cursor.setAttribute("raycaster", "objects: none");
 
-// Hide controls initially
-playPauseButton.style.display = "none";
-videoControls.style.display = "none";
-
-let lastPlayedVideo = null; // Track the last played video
-
-// Function to get the currently playing video
+// Helper Functions
 function getCurrentPlayingVideo() {
-  return (
-    videoElements.find((video) => !video.paused && video.readyState >= 3) ||
-    lastPlayedVideo
-  );
+  return videoElements.find(video => !video.paused && video.readyState >= 3) || lastPlayedVideo;
 }
 
-// Play/Pause Button Click Event
-playPauseButton.addEventListener("click", () => {
+function updateTimeline() {
   const currentVideo = getCurrentPlayingVideo();
-
-  if (currentVideo) {
-    if (currentVideo.paused) {
-      currentVideo.muted = false; // Ensure it's unmuted before playing
-      currentVideo
-        .play()
-        .then(() => {
-          playPauseButton.textContent = "II"; // Show Pause symbol
-          lastPlayedVideo = currentVideo; // Store last played video
-        })
-        .catch((error) => {
-          console.error("Playback failed:", error);
-        });
-    } else {
-      currentVideo.pause();
-      playPauseButton.textContent = "▶"; // Show Play symbol
-    }
-  } else {
-    console.warn("No video is currently playing.");
+  if (currentVideo?.duration) {
+    elements.videoTimeline.max = currentVideo.duration;
+    elements.videoTimeline.value = currentVideo.currentTime;
   }
-});
+}
 
-// Ensure the play/pause button only appears when a video starts playing
-videoElements.forEach((video) => {
+function showMenu() {
+  elements.menu.setAttribute("visible", true);
+  elements.menu.classList.remove("hidden");
+  elements.cursor.setAttribute("raycaster", "objects: .clickable");
+}
+
+function showHomeButton() {
+  elements.menu.classList.add("hidden");
+  elements.homebtn.setAttribute("visible", true);
+  elements.homebtn.classList.remove("hidden");
+  elements.cursor.setAttribute("raycaster", "objects: .clickable");
+}
+
+// Video Control Functions
+function togglePlayPause() {
+  const currentVideo = getCurrentPlayingVideo();
+  if (!currentVideo) return;
+
+  if (currentVideo.paused) {
+    currentVideo.muted = false;
+    currentVideo.play()
+      .then(() => {
+        elements.playPauseButton.textContent = "II";
+        lastPlayedVideo = currentVideo;
+      })
+      .catch(error => console.error("Playback failed:", error));
+  } else {
+    currentVideo.pause();
+    elements.playPauseButton.textContent = "▶";
+  }
+}
+
+function switchVideo(videoId) {
+  videoElements.forEach(vid => vid.pause());
+
+  elements.videoSphere.setAttribute("src", `#${videoId}`);
+  const newVideo = document.getElementById(videoId);
+  newVideo.currentTime = 0;
+  newVideo.muted = false;
+  newVideo.play().catch(e => console.error(e));
+
+  elements.menu.setAttribute("visible", false);
+  elements.menu.classList.add("hidden");
+  elements.homebtn.setAttribute("visible", false);
+  elements.homebtn.classList.add("hidden");
+  elements.cursor.setAttribute("raycaster", "objects: none");
+
+  if (videoId === videoIdsMap[SCENES.INTRO]) {
+    elements.homebtn.setAttribute("visible", false);
+    elements.homebtn.classList.add("hidden");
+  }
+}
+
+// Event Listeners Setup
+function setupVideoListeners(video) {
   video.addEventListener("play", () => {
-    lastPlayedVideo = video; // Track the currently playing video
-    playPauseButton.style.display = "flex"; // Show play/pause button
-    playPauseButton.textContent = "II"; // Set to pause
-    videoControls.style.display = "flex"; // Show timeline
+    lastPlayedVideo = video;
+    elements.playPauseButton.style.display = "flex";
+    elements.playPauseButton.textContent = "II";
+    elements.videoControls.style.display = "flex";
   });
 
   video.addEventListener("pause", () => {
-    playPauseButton.style.display = "flex"; // Keep visible even when paused
-    playPauseButton.textContent = "▶"; // Set to play
-    videoControls.style.display = "flex"; // Keep timeline visible
+    elements.playPauseButton.textContent = "▶";
   });
 
   video.addEventListener("ended", () => {
-    playPauseButton.style.display = "none"; // Hide button when video ends
-    videoControls.style.display = "none"; // Hide timeline when video ends
+    elements.playPauseButton.style.display = "none";
+    elements.videoControls.style.display = "none";
 
-    if (video.id === videoIdsMap.intro) {
-      menu.setAttribute("visible", true);
-      menu.classList.remove("hidden");
-      cursor.setAttribute("raycaster", "objects: .clickable");
+    if (video.id === videoIdsMap[SCENES.INTRO]) {
+      showMenu();
     } else {
-      menu.classList.add("hidden");
-      homebtn.setAttribute("visible", true);
-      homebtn.classList.remove("hidden");
-      cursor.setAttribute("raycaster", "objects: .clickable");
+      showHomeButton();
     }
   });
 
   video.addEventListener("timeupdate", updateTimeline);
-});
-
-// Function to update the timeline as video plays
-function updateTimeline() {
-  const currentVideo = getCurrentPlayingVideo();
-  if (currentVideo && currentVideo.duration) {
-    videoTimeline.max = currentVideo.duration;
-    videoTimeline.value = currentVideo.currentTime;
-  }
+  
+  // Error handling
+  video.addEventListener("waiting", () => console.warn(`Buffering: ${video.id}`));
+  video.addEventListener("stalled", () => {
+    console.warn(`Stalled: ${video.id}`);
+    video.play().catch(e => console.error("Playback Error:", e));
+  });
+  video.addEventListener("error", e => console.error(`Error: ${video.id}`, e));
 }
 
-// Function to seek video when user interacts with timeline
-videoTimeline.addEventListener("change", () => {
-  const currentVideo = getCurrentPlayingVideo();
-  if (currentVideo) {
-    currentVideo.currentTime = videoTimeline.value;
-  }
-});
+// Initialize video settings
+function initializeVideo(video) {
+  video.setAttribute("preload", "auto");
+  video.setAttribute("playsinline", "true");
+  video.setAttribute("muted", "true");
+  video.setAttribute("autoplay", "false");
+  video.setAttribute("controls", "false");
+  video.setAttribute("loop", "false");
+}
 
+// DOMContentLoaded setup
 document.addEventListener("DOMContentLoaded", () => {
-  const hlsUrl =
-    "https://m2qall8jajdg-hls-push.5centscdn.com/mp4/comp/intro-test.mp4/playlist.m3u8";
-
-  //Stop browser from preloading or playing video
-  introVideo.load(); // Force browser to clear any preloaded content
-  introVideo.pause();
-  introVideo.currentTime = 0;
-  introVideo.muted = true; // Keep muted until user interaction
-  skipButton.style.display = "none"; // Initially hide Skip Intro button
-
-  introVideo.currentTime = 0; // Ensure it starts at 0
-  introVideo.removeAttribute("src"); // Prevents auto-loading
-  menu.classList.add("hidden"); // Hide menu initially
-
-  introPlayButton.addEventListener("click", () => {
-    introPlayButton.style.display = "none"; // Hide Start Experience button
-    scene.style.visibility = "visible"; // Show A-Frame scene
-    skipButton.style.display = "block"; // Show Skip button
-
-    introVideo.src = videoUrlsMap.intro;
-    introVideo.muted = false; // Ensure it's not muted
-    introVideo
-      .play()
-      .then(() => {
-        console.log("Intro video started.");
-      })
-      .catch((error) => {
-        console.error("Playback Error:", error);
-      });
-
-    // // 🚀 Load HLS ONLY when the user clicks "Start Experience"
-    // if (Hls.isSupported()) {
-    //   const hls = new Hls();
-    //   hls.loadSource(hlsUrl);
-    //   hls.attachMedia(introVideo);
-    //   hls.on(Hls.Events.MANIFEST_PARSED, () => {
-    //     console.log("HLS manifest loaded, ready to play intro video.");
-    //     introVideo.muted = false; // Ensure it's not muted
-    //     introVideo.play().catch((e) => console.error("Playback Error:", e));
-    //   });
-    //   console.log("Experience started, playing intro video.");
-    // } else if (introVideo.canPlayType("application/vnd.apple.mpegurl")) {
-    //   introVideo.src = hlsUrl;
-    //   introVideo.muted = false;
-    //   introVideo.play().catch((e) => console.error("Playback Error:", e));
-    //   console.log("Experience started, playing intro video.");
-    // } else {
-    //   console.error("HLS not supported on this browser.");
-    // }
+  // Initialize all videos
+  videoElements.forEach(video => {
+    initializeVideo(video);
+    setupVideoListeners(video);
   });
 
-  // 🚀 Show Menu 5 Seconds Before the Intro Video Ends
-  introVideo.addEventListener("timeupdate", () => {
-    if (introVideo.duration - introVideo.currentTime <= 5) {
-      menu.setAttribute("visible", true);
-      menu.classList.remove("hidden");
+  // Intro video setup
+  introVideo.load();
+  introVideo.pause();
+  introVideo.currentTime = 0;
+  introVideo.muted = true;
 
-      // Enable cursor interactions for menu
-      cursor.setAttribute("raycaster", "objects: .clickable");
-
-      console.log("Menu displayed 5 seconds before the intro video ends.");
+  // Button click handlers
+  elements.playPauseButton.addEventListener("click", togglePlayPause);
+  
+  elements.videoTimeline.addEventListener("change", () => {
+    const currentVideo = getCurrentPlayingVideo();
+    if (currentVideo) {
+      currentVideo.currentTime = elements.videoTimeline.value;
     }
   });
 
-  skipButton.addEventListener("click", () => {
+  // Setup intro play button
+  const introPlayButton = document.getElementById(playButtonIdsMap[SCENES.INTRO]);
+  introPlayButton.addEventListener("click", () => {
+    introPlayButton.style.display = "none";
+    elements.scene.style.visibility = "visible";
+    elements.skipButton.style.display = "block";
+
+    introVideo.src = videoUrlsMap[SCENES.INTRO];
+    introVideo.muted = false;
+    introVideo.play()
+      .then(() => console.log("Intro video started."))
+      .catch(error => console.error("Playback Error:", error));
+  });
+
+  // Setup skip button
+  elements.skipButton.addEventListener("click", () => {
     if (introVideo.readyState >= 3) {
       introVideo.currentTime = introVideo.duration - 2;
       introVideo.play();
-      console.log("Intro skipped.");
-    } else {
-      console.error("Intro video is not ready.");
+      elements.skipButton.style.display = "none";
     }
-
-    // Hide Skip Intro button after skipping
-    skipButton.style.display = "none";
   });
 
-  // Apply best practices for mobile streaming
-  videoElements.forEach((video) => {
-    video.setAttribute("preload", "auto"); // Preload improves playback
-    video.setAttribute("playsinline", "true");
-    video.setAttribute("muted", "true"); // Required for autoplay on mobile
-    video.setAttribute("autoplay", "false"); // Start manually after interaction
-    video.setAttribute("controls", "false");
-    video.setAttribute("loop", "false");
+  // Setup home button
+  elements.homebtn.addEventListener("click", () => {
+    introVideo.pause();
+    introVideo.load();
+    elements.videoSphere.setAttribute("src", `#${videoIdsMap[SCENES.INTRO]}`);
 
-    // Event listeners to recover from buffering issues
-    video.addEventListener("waiting", () => {
-      console.warn(`Buffering detected in ${video.id}, attempting recovery...`);
-    });
-
-    video.addEventListener("stalled", () => {
-      console.warn(`Network stalled for ${video.id}, retrying...`);
-      video.play().catch((e) => console.error("Playback Error:", e));
-    });
-
-    video.addEventListener("error", (e) => {
-      console.error(`Error loading video: ${video.id}`, e);
-    });
-  });
-
-  // Click Events for Switching Videos
-  videoKeys.forEach((videoKey) => {
-    const buttonId = playButtonIdsMap[videoKey];
-    const videoId = videoIdsMap[videoKey];
-    const button = document.getElementById(buttonId);
-    button.addEventListener("click", () => switchVideo(videoId));
-  });
-
-  // Handle iOS autoplay issues by ensuring a user interaction
-  document.body.addEventListener(
-    "touchstart",
-    () => {
-      if (introVideo.paused) {
-        introVideo
-          .play()
-          .catch((e) => console.error("iOS Touch Play Error:", e));
+    function seekAndPauseIntro() {
+      if (!isNaN(introVideo.duration) && introVideo.duration > 4) {
+        introVideo.currentTime = introVideo.duration - 4;
+        introVideo.pause();
       }
-    },
-    { once: true }
-  ); // Runs only once
-});
-
-//  Disable cursor interactions at the start
-cursor.setAttribute("raycaster", "objects: none");
-
-//  Store last timestamp for `intro-video`
-let introVideoPauseTime = 0;
-
-//  Function to Switch Videos
-function switchVideo(videoId) {
-  videoElements.forEach((vid) => vid.pause());
-
-  videoSphere.setAttribute("src", `#${videoId}`);
-  const newVideo = document.getElementById(videoId);
-  newVideo.currentTime = 0;
-  newVideo.muted = false;
-  newVideo.play().catch((e) => console.error(e));
-
-  //  Hide Menu & Home Button During Video Play
-  menu.setAttribute("visible", false);
-  menu.classList.add("hidden");
-
-  homebtn.setAttribute("visible", false);
-  homebtn.classList.add("hidden");
-
-  //  Disable cursor interactions until the home button appears
-  cursor.setAttribute("raycaster", "objects: none");
-
-  //  Show Home Button Only When NOT Intro Video
-  if (videoId === videoIdsMap.intro) {
-    homebtn.setAttribute("visible", false);
-    homebtn.classList.add("hidden");
-  }
-}
-
-//  Home Button Click: Return to Intro Video & Show Menu
-homebtn.addEventListener("click", () => {
-  console.log("🏠 Home button clicked. Returning to Intro Video...");
-
-  // Pause any playing videos and reset the scene to intro video
-  introVideo.pause();
-  introVideo.load();
-  videoSphere.setAttribute("src", `#${videoIdsMap.intro}`);
-
-  function seekAndPauseIntro() {
-    if (!isNaN(introVideo.duration) && introVideo.duration > 4) {
-      introVideo.currentTime = introVideo.duration - 4; // Seek to last 4 seconds
-      introVideo.pause();
-      console.log(
-        `✅ Intro Video Paused at ${introVideo.currentTime.toFixed(2)}s`
-      );
-    } else {
-      console.warn("⏳ Waiting for metadata...");
     }
-  }
 
-  if (introVideo.readyState >= 2) {
-    seekAndPauseIntro();
-  } else {
-    introVideo.addEventListener("loadedmetadata", seekAndPauseIntro, {
-      once: true,
+    if (introVideo.readyState >= 2) {
+      seekAndPauseIntro();
+    } else {
+      introVideo.addEventListener("loadedmetadata", seekAndPauseIntro, { once: true });
+    }
+
+    elements.homebtn.setAttribute("visible", false);
+    elements.homebtn.classList.add("hidden");
+    elements.homebtn.style.display = "none";
+    showMenu();
+  });
+
+  // Setup video buttons
+  Object.entries(videoIdsMap).forEach(([key, videoId]) => {
+    const buttonId = playButtonIdsMap[key];
+    const button = document.getElementById(buttonId);
+    button?.addEventListener("click", () => switchVideo(videoId));
+  });
+
+  // Setup button hover effects
+  document.querySelectorAll(".clickable").forEach(button => {
+    button.addEventListener("mouseenter", () => {
+      button.setAttribute("scale", "1.1 1.1 1");
+      button.setAttribute("material", "color: #FFFF00");
     });
-  }
 
-  // 🔥 Hide the home button completely (Both A-Frame & CSS)
-  homebtn.setAttribute("visible", false); // A-Frame method
-  homebtn.classList.add("hidden"); // Hide using CSS
-  homebtn.style.display = "none"; // Ensure it doesn’t show again
-
-  // Show menu again
-  menu.setAttribute("visible", true);
-  menu.classList.remove("hidden");
-
-  console.log(
-    "🏠 Successfully switched back to the Intro Video, home button removed."
-  );
-});
-
-//  Button Hover Effects
-document.querySelectorAll(".clickable").forEach((button) => {
-  button.addEventListener("mouseenter", () => {
-    button.setAttribute("scale", "1.1 1.1 1");
-    button.setAttribute("material", "color: #FFFF00");
+    button.addEventListener("mouseleave", () => {
+      button.setAttribute("scale", "1 1 1");
+      button.setAttribute("material", "color: #FFFFFF");
+    });
   });
 
-  button.addEventListener("mouseleave", () => {
-    button.setAttribute("scale", "1 1 1");
-    button.setAttribute("material", "color: #FFFFFF");
-  });
+  // Mobile touch handler
+  document.body.addEventListener("touchstart", () => {
+    if (introVideo.paused) {
+      introVideo.play().catch(e => console.error("iOS Touch Play Error:", e));
+    }
+  }, { once: true });
 
-  button.addEventListener("click", () => {
-    console.log(`${button.id} clicked!`);
+  // Show menu near end of intro video
+  introVideo.addEventListener("timeupdate", () => {
+    if (introVideo.duration - introVideo.currentTime <= 5) {
+      showMenu();
+    }
   });
 });
