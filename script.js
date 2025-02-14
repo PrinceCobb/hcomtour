@@ -1,14 +1,14 @@
 // Video Scene Keys
 const SCENES = {
-  INTRO: 'intro',
-  OMM_LAB: 'ommLab',
-  ANATOMY_LAB: 'anatomyLab',
-  CLINICAL_LAB: 'clinicalLab',
-  TRANSLATION_LAB: 'translationLab',
-  CAFE: 'cafe',
-  STUDY: 'study',
-  FITNESS: 'fitness',
-  ADMIN: 'admin'
+  INTRO: "intro",
+  OMM_LAB: "ommLab",
+  ANATOMY_LAB: "anatomyLab",
+  CLINICAL_LAB: "clinicalLab",
+  TRANSLATION_LAB: "translationLab",
+  CAFE: "cafe",
+  STUDY: "study",
+  FITNESS: "fitness",
+  ADMIN: "admin",
 };
 
 // DOM Elements
@@ -21,7 +21,7 @@ const elements = {
   skipButton: document.getElementById("skip-button"),
   playPauseButton: document.getElementById("play-pause-button"),
   videoTimeline: document.getElementById("video-timeline"),
-  videoControls: document.getElementById("video-controls")
+  videoControls: document.getElementById("video-controls"),
 };
 
 // Video and Button Mappings
@@ -34,7 +34,7 @@ const playButtonIdsMap = {
   [SCENES.CAFE]: "cafe-btn",
   [SCENES.STUDY]: "study-btn",
   [SCENES.FITNESS]: "fitness-btn",
-  [SCENES.ADMIN]: "admin-btn"
+  [SCENES.ADMIN]: "admin-btn",
 };
 
 const videoIdsMap = {
@@ -46,19 +46,27 @@ const videoIdsMap = {
   [SCENES.CAFE]: "scene-six-video",
   [SCENES.STUDY]: "scene-seven-video",
   [SCENES.FITNESS]: "scene-eight-video",
-  [SCENES.ADMIN]: "scene-nine-video"
+  [SCENES.ADMIN]: "scene-nine-video",
 };
 
 const videoUrlsMap = {
-  [SCENES.INTRO]: "https://m2qall8jajdg-hls-push.5centscdn.com/mp4/comp/intro-test.mp4",
-  [SCENES.OMM_LAB]: "https://m2qall8jajdg-hls-push.5centscdn.com/mp4/comp/OMM.mp4",
-  [SCENES.ANATOMY_LAB]: "https://m2qall8jajdg-hls-push.5centscdn.com/mp4/comp/Anatomy.mp4",
-  [SCENES.CLINICAL_LAB]: "https://m2qall8jajdg-hls-push.5centscdn.com/mp4/comp/CTAC.mp4",
+  [SCENES.INTRO]:
+    "https://m2qall8jajdg-hls-push.5centscdn.com/mp4/comp/intro-test.mp4",
+  [SCENES.OMM_LAB]:
+    "https://m2qall8jajdg-hls-push.5centscdn.com/mp4/comp/OMM.mp4",
+  [SCENES.ANATOMY_LAB]:
+    "https://m2qall8jajdg-hls-push.5centscdn.com/mp4/comp/Anatomy.mp4",
+  [SCENES.CLINICAL_LAB]:
+    "https://m2qall8jajdg-hls-push.5centscdn.com/mp4/comp/CTAC.mp4",
   [SCENES.TRANSLATION_LAB]: "",
-  [SCENES.CAFE]: "https://m2qall8jajdg-hls-push.5centscdn.com/mp4/comp/Student.mp4",
-  [SCENES.STUDY]: "https://m2qall8jajdg-hls-push.5centscdn.com/mp4/comp/Classrooms.mp4",
-  [SCENES.FITNESS]: "https://m2qall8jajdg-hls-push.5centscdn.com/mp4/comp/Fitness.mp4",
-  [SCENES.ADMIN]: "https://m2qall8jajdg-hls-push.5centscdn.com/mp4/comp/Admissionnw.mp4"
+  [SCENES.CAFE]:
+    "https://m2qall8jajdg-hls-push.5centscdn.com/mp4/comp/Student.mp4",
+  [SCENES.STUDY]:
+    "https://m2qall8jajdg-hls-push.5centscdn.com/mp4/comp/Classrooms.mp4",
+  [SCENES.FITNESS]:
+    "https://m2qall8jajdg-hls-push.5centscdn.com/mp4/comp/Fitness.mp4",
+  [SCENES.ADMIN]:
+    "https://m2qall8jajdg-hls-push.5centscdn.com/mp4/comp/Admissionnw.mp4",
 };
 
 // State variables
@@ -66,7 +74,9 @@ let lastPlayedVideo = null;
 let introVideoPauseTime = 0;
 
 // Get all video elements
-const videoElements = Object.values(videoIdsMap).map(id => document.getElementById(id));
+const videoElements = Object.values(videoIdsMap).map((id) =>
+  document.getElementById(id)
+);
 const introVideo = document.getElementById(videoIdsMap[SCENES.INTRO]);
 
 // Initialize controls
@@ -78,7 +88,10 @@ elements.cursor.setAttribute("raycaster", "objects: none");
 
 // Helper Functions
 function getCurrentPlayingVideo() {
-  return videoElements.find(video => !video.paused && video.readyState >= 3) || lastPlayedVideo;
+  return (
+    videoElements.find((video) => !video.paused && video.readyState >= 3) ||
+    lastPlayedVideo
+  );
 }
 
 function updateTimeline() {
@@ -109,12 +122,13 @@ function togglePlayPause() {
 
   if (currentVideo.paused) {
     currentVideo.muted = false;
-    currentVideo.play()
+    currentVideo
+      .play()
       .then(() => {
         elements.playPauseButton.textContent = "II";
         lastPlayedVideo = currentVideo;
       })
-      .catch(error => console.error("Playback failed:", error));
+      .catch((error) => console.error("Playback failed:", error));
   } else {
     currentVideo.pause();
     elements.playPauseButton.textContent = "▶";
@@ -122,7 +136,7 @@ function togglePlayPause() {
 }
 
 function switchVideo(key, videoId) {
-  videoElements.forEach(vid => vid.pause());
+  videoElements.forEach((vid) => vid.pause());
 
   elements.videoSphere.setAttribute("src", `#${videoId}`);
   const newVideo = document.getElementById(videoId);
@@ -132,7 +146,7 @@ function switchVideo(key, videoId) {
   if (!newVideo.src) {
     newVideo.src = videoUrlsMap[key];
   }
-  newVideo.play().catch(e => console.error(e));
+  newVideo.play().catch((e) => console.error(e));
 
   elements.menu.setAttribute("visible", false);
   elements.menu.classList.add("hidden");
@@ -171,14 +185,18 @@ function setupVideoListeners(video) {
   });
 
   video.addEventListener("timeupdate", updateTimeline);
-  
+
   // Error handling
-  video.addEventListener("waiting", () => console.warn(`Buffering: ${video.id}`));
+  video.addEventListener("waiting", () =>
+    console.warn(`Buffering: ${video.id}`)
+  );
   video.addEventListener("stalled", () => {
     console.warn(`Stalled: ${video.id}`);
-    video.play().catch(e => console.error("Playback Error:", e));
+    video.play().catch((e) => console.error("Playback Error:", e));
   });
-  video.addEventListener("error", e => console.error(`Error: ${video.id}`, e));
+  video.addEventListener("error", (e) =>
+    console.error(`Error: ${video.id}`, e)
+  );
 }
 
 // Initialize video settings
@@ -194,7 +212,7 @@ function initializeVideo(video) {
 // DOMContentLoaded setup
 document.addEventListener("DOMContentLoaded", () => {
   // Initialize all videos
-  videoElements.forEach(video => {
+  videoElements.forEach((video) => {
     initializeVideo(video);
     setupVideoListeners(video);
   });
@@ -207,7 +225,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Button click handlers
   elements.playPauseButton.addEventListener("click", togglePlayPause);
-  
+
   elements.videoTimeline.addEventListener("change", () => {
     const currentVideo = getCurrentPlayingVideo();
     if (currentVideo) {
@@ -216,7 +234,9 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   // Setup intro play button
-  const introPlayButton = document.getElementById(playButtonIdsMap[SCENES.INTRO]);
+  const introPlayButton = document.getElementById(
+    playButtonIdsMap[SCENES.INTRO]
+  );
   introPlayButton.addEventListener("click", () => {
     introPlayButton.style.display = "none";
     elements.scene.style.visibility = "visible";
@@ -224,9 +244,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
     introVideo.src = videoUrlsMap[SCENES.INTRO];
     introVideo.muted = false;
-    introVideo.play()
+    introVideo
+      .play()
       .then(() => console.log("Intro video started."))
-      .catch(error => console.error("Playback Error:", error));
+      .catch((error) => console.error("Playback Error:", error));
   });
 
   // Setup skip button
@@ -243,6 +264,13 @@ document.addEventListener("DOMContentLoaded", () => {
     introVideo.pause();
     introVideo.load();
     elements.videoSphere.setAttribute("src", `#${videoIdsMap[SCENES.INTRO]}`);
+    // Reset video elements except intro video
+    videoElements
+      .filter((video) => video !== introVideo)
+      .forEach((video) => {
+        video.src = "";
+        video.load();
+      });
 
     function seekAndPauseIntro() {
       if (!isNaN(introVideo.duration) && introVideo.duration > 4) {
@@ -254,7 +282,9 @@ document.addEventListener("DOMContentLoaded", () => {
     if (introVideo.readyState >= 2) {
       seekAndPauseIntro();
     } else {
-      introVideo.addEventListener("loadedmetadata", seekAndPauseIntro, { once: true });
+      introVideo.addEventListener("loadedmetadata", seekAndPauseIntro, {
+        once: true,
+      });
     }
 
     elements.homebtn.setAttribute("visible", false);
@@ -271,7 +301,7 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   // Setup button hover effects
-  document.querySelectorAll(".clickable").forEach(button => {
+  document.querySelectorAll(".clickable").forEach((button) => {
     button.addEventListener("mouseenter", () => {
       button.setAttribute("scale", "1.1 1.1 1");
       button.setAttribute("material", "color: #FFFF00");
@@ -284,11 +314,17 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   // Mobile touch handler
-  document.body.addEventListener("touchstart", () => {
-    if (introVideo.paused) {
-      introVideo.play().catch(e => console.error("iOS Touch Play Error:", e));
-    }
-  }, { once: true });
+  document.body.addEventListener(
+    "touchstart",
+    () => {
+      if (introVideo.paused) {
+        introVideo
+          .play()
+          .catch((e) => console.error("iOS Touch Play Error:", e));
+      }
+    },
+    { once: true }
+  );
 
   // Show menu near end of intro video
   introVideo.addEventListener("timeupdate", () => {
