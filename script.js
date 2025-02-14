@@ -14,9 +14,9 @@ const SCENES = {
 // DOM Elements
 const elements = {
   scene: document.getElementById("scene"),
-  menu: document.getElementById("menubtn"),
+  menuOptions: document.getElementById("menubtn"),
   videoSphere: document.getElementById("main-video-sphere"),
-  homebtn: document.getElementById("home"),
+  backToHomeBtn: document.getElementById("home"),
   cursor: document.querySelector("a-cursor"),
   skipButton: document.getElementById("skip-button"),
   playPauseButton: document.getElementById("play-pause-button"),
@@ -84,17 +84,17 @@ const videoElements = Object.values(videoIdsMap).map((id) =>
 elements.playPauseButton.style.display = "none";
 elements.videoControls.style.display = "none";
 elements.skipButton.style.display = "none";
-elements.menu.setAttribute("visible", false);
-elements.homebtn.setAttribute("visible", false);
+elements.menuOptions.setAttribute("visible", false);
+elements.backToHomeBtn.setAttribute("visible", false);
 elements.cursor.setAttribute("raycaster", "objects: none");
 
-function showMenu() {
-  elements.menu.setAttribute("visible", true);
+function showMenuOptions() {
+  elements.menuOptions.setAttribute("visible", true);
   elements.cursor.setAttribute("raycaster", "objects: .clickable");
 }
 
-function showHomeButton() {
-  elements.homebtn.setAttribute("visible", true);
+function showBackToHomeButton() {
+  elements.backToHomeBtn.setAttribute("visible", true);
   elements.cursor.setAttribute("raycaster", "objects: .clickable");
 }
 
@@ -144,8 +144,8 @@ function switchVideo(key, videoId) {
   newVideo.play().catch((e) => console.error(e));
   currentVideo = newVideo;
 
-  elements.menu.setAttribute("visible", false);
-  elements.homebtn.setAttribute("visible", false);
+  elements.menuOptions.setAttribute("visible", false);
+  elements.backToHomeBtn.setAttribute("visible", false);
   elements.cursor.setAttribute("raycaster", "objects: none");
 
   if (videoId === videoIdsMap[SCENES.INTRO]) {
@@ -179,9 +179,9 @@ function setupVideoListeners(video) {
     elements.skipButton.style.display = "none";
 
     if (video.id === videoIdsMap[SCENES.INTRO]) {
-      showMenu();
+      showMenuOptions();
     } else {
-      showHomeButton();
+      showBackToHomeButton();
     }
   });
 
@@ -236,9 +236,10 @@ document.addEventListener("DOMContentLoaded", () => {
   elements.skipButton.addEventListener("click", skipToAlmostEnd);
 
   // Setup home button
-  elements.homebtn.addEventListener("click", () => {
+  elements.backToHomeBtn.addEventListener("click", () => {
     switchVideo(SCENES.INTRO, videoIdsMap[SCENES.INTRO]);
     skipToEnd();
+    showMenuOptions();
   });
 
   // Setup video buttons
