@@ -121,13 +121,17 @@ function togglePlayPause() {
   }
 }
 
-function switchVideo(videoId) {
+function switchVideo(key, videoId) {
   videoElements.forEach(vid => vid.pause());
 
   elements.videoSphere.setAttribute("src", `#${videoId}`);
   const newVideo = document.getElementById(videoId);
   newVideo.currentTime = 0;
   newVideo.muted = false;
+  // load video source if not already loaded
+  if (!newVideo.src) {
+    newVideo.src = videoUrlsMap[key];
+  }
   newVideo.play().catch(e => console.error(e));
 
   elements.menu.setAttribute("visible", false);
@@ -263,7 +267,7 @@ document.addEventListener("DOMContentLoaded", () => {
   Object.entries(videoIdsMap).forEach(([key, videoId]) => {
     const buttonId = playButtonIdsMap[key];
     const button = document.getElementById(buttonId);
-    button?.addEventListener("click", () => switchVideo(videoId));
+    button?.addEventListener("click", () => switchVideo(key, videoId));
   });
 
   // Setup button hover effects
