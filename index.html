@@ -6,26 +6,6 @@
   <title>HCOM Tour</title>
   <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
   <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
-  <script>
-    async function enableMotionSensors() {
-      try {
-        if (DeviceMotionEvent?.requestPermission) {
-          const permission = await DeviceMotionEvent.requestPermission();
-          if (permission === "granted") startMotionTracking();
-        } else {
-          startMotionTracking();
-        }
-      } catch (error) {
-        console.error("Motion sensor access denied:", error);
-      }
-    }
-    function startMotionTracking() {
-      window.addEventListener("devicemotion", (event) => console.log("Motion sensors activated:", event));
-    }
-    document.addEventListener("DOMContentLoaded", enableMotionSensors);
-    document.addEventListener("click", enableMotionSensors);
-    document.addEventListener("touchstart", enableMotionSensors);
-  </script>
   
   <style>
     body { background-color: white !important; }
