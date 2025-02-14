@@ -48,13 +48,27 @@
   <style>
      /* Hide A-Frame's Default Dialog & Dark Overlay */
     .a-dialog-overlay, .a-dialog {
-        display: none !important;
+    display: none !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
+}
     }
+    
+    body, html {
+    background-color: white !important;
+}
 
-    /* Remove any unwanted dark background */
-    body {
-        background-color: white !important;
-    }
+#scene {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+#play-button {
+    z-index: 1000; /* Ensure button is on top */
+}
     
     #play-button {
       position: absolute;
@@ -163,7 +177,7 @@
      <img id="skip-button" src="https://m2qall8jajdg-hls-push.5centscdn.com/btn/skipintro.png"/>
   </div>
 
-  <a-scene id="scene" loading-screen="enabled:false">
+  <a-scene id="scene" loading-screen="enabled: false">
     <a-assets>
       <video id="intro-video" crossorigin="anonymous" playsinline preload="none"></video> 
       <!-- <video id="intro-video" src="introx2.mp4" crossorigin="anonymous" playsinline muted preload="auto"></video> -->
@@ -337,14 +351,12 @@ allVideos.forEach((video) => {
 
     // Handle "Start Experience" Click
     playButton.addEventListener("click", () => {
-        playButton.style.display = "none"; // Hide button
+    playButton.style.display = "none"; // Hide button
+    scene.style.visibility = "visible"; // Show A-Frame scene
+    scene.style.display = "block";  // Ensure it's fully visible
+    videoSky.setAttribute("visible", "true");
 
-        // Make A-Frame scene visible
-        scene.style.visibility = "visible";
-        videoSky.setAttribute("visible", "true");
-
-        // Set background to black (smooth transition from white)
-        document.body.style.backgroundColor = "white";
+    document.body.style.backgroundColor = "white"; // Ensure no black fade-in 
 
         // Load and play video
         const videoUrl = "https://m2qall8jajdg-hls-push.5centscdn.com/mp4/comp/intro-test.mp4";
@@ -364,7 +376,7 @@ allVideos.forEach((video) => {
 
    
 //  Disable cursor interactions at the start
-cursor.setAttribute("raycaster", "objects: none"); 
+cursor.setAttribute("raycaster", "objects: none");  
 
 // Play Experience Button Click Event
     // Step 2: Only load video when user clicks "Start Experience"
@@ -633,7 +645,7 @@ document.querySelectorAll(".clickable").forEach((button) => {
   playButton.addEventListener("click", () => {
     playButton.style.display = "none"; // Hide button after clicking
     introVideo.muted = false; // Unmute video after interaction
-    introVideo.removeAttribute("muted"); // Ensure browsers recognize change
+    introVideo.removeAttribute("muted"); // Ensure browsers recognize change 
     introVideo.currentTime = 0; // Restart from beginning
 
     introVideo.play().then(() => {
