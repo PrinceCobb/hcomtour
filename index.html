@@ -6,7 +6,7 @@
   <title>HCOM Tour</title>
   <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
   <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
-   <script>
+  <script>
         async function enableMotionSensors() {
         try {
             if (typeof DeviceMotionEvent !== "undefined" && typeof DeviceMotionEvent.requestPermission === "function") {
@@ -55,8 +55,7 @@
     body {
         background-color: white !important;
     }
-
-  <style>
+    
     #play-button {
       position: absolute;
       top: calc(50% - 25px);
@@ -235,6 +234,7 @@ const allVideos = [
   introVideo, secVideo, thirdVideo, fourthVideo,
   fifthVideo, sixthVideo, sevVideo, eigVideo, nineVideo
 ]; 
+    
    
 // Step 1: Completely remove the video source on page load
     document.addEventListener("DOMContentLoaded", () => {
@@ -328,62 +328,43 @@ allVideos.forEach((video) => {
   });
 });
    
-   // Ensure video does not autoplay on page load
-introVideo.pause();
-introVideo.currentTime = 0;
-introVideo.muted = true; // Keep muted until user interaction
+    // Ensure video does not load until user clicks "Start Experience"
+    document.addEventListener("DOMContentLoaded", () => {
+        introVideo.removeAttribute("src"); // Prevent auto-loading
+        introVideo.load();
+        console.log("Intro video source removed to prevent autoplay.");
+    });
 
-document.addEventListener("DOMContentLoaded", () => {
-  const introVideo = document.getElementById("intro-video");
-  const hlsUrl = 'https://m2qall8jajdg-hls-push.5centscdn.com/mp4/comp/intro-test.mp4/playlist.m3u8';
+    // Handle "Start Experience" Click
+    playButton.addEventListener("click", () => {
+        playButton.style.display = "none"; // Hide button
 
-  //Stop browser from preloading or playing video
-  introVideo.pause();
-  introVideo.currentTime = 0; // Ensure it starts at 0
-  introVideo.removeAttribute("src"); // Prevents auto-loading
-  menu.classList.add("hidden"); // Hide menu initially
+        // Make A-Frame scene visible
+        scene.style.visibility = "visible";
+        videoSky.setAttribute("visible", "true");
 
-  playButton.addEventListener("click", () => {
-    playButton.style.display = "none"; // Hide Start Experience button
-    scene.style.visibility = "visible"; // Show A-Frame scene
-    skipButton.style.display = "block"; // Show Skip button
+        // Set background to black (smooth transition from white)
+        document.body.style.backgroundColor = "white";
 
-    // 🚀 Load HLS ONLY when the user clicks "Start Experience"
-    if (Hls.isSupported()) {
-      const hls = new Hls();
-      hls.loadSource(hlsUrl);
-      hls.attachMedia(introVideo);
-      hls.on(Hls.Events.MANIFEST_PARSED, () => {
-        console.log("HLS manifest loaded, ready to play intro video.");
-        introVideo.muted = false; // Ensure it's not muted
-        introVideo.play().catch((e) => console.error("Playback Error:", e));
-      });
-    } else if (introVideo.canPlayType("application/vnd.apple.mpegurl")) {
-      introVideo.src = hlsUrl;
-      introVideo.muted = false;
-      introVideo.play().catch((e) => console.error("Playback Error:", e));
-    } else {
-      console.error("HLS not supported on this browser.");
-    }
-  });
+        // Load and play video
+        const videoUrl = "https://m2qall8jajdg-hls-push.5centscdn.com/mp4/comp/intro-test.mp4";
+        introVideo.src = videoUrl;
+        introVideo.muted = false;
+        introVideo.currentTime = 0;
 
-  // 🚀 Show Menu 5 Seconds Before the Intro Video Ends
-  introVideo.addEventListener("timeupdate", () => {
-    if (introVideo.duration - introVideo.currentTime <= 5) {
-      menu.setAttribute("visible", true);
-      menu.classList.remove("hidden");
+        introVideo.play().then(() => {
+            console.log("Intro video started successfully.");
+        }).catch((error) => {
+            console.error("Playback Error:", error);
+        });
 
-      // Enable cursor interactions for menu
-      cursor.setAttribute("raycaster", "objects: .clickable");
+        // Assign video to A-Frame videosphere
+        videoSky.setAttribute("src", "#intro-video");
+    });
 
-      console.log("Menu displayed 5 seconds before the intro video ends.");
-    }
-  });
-});
    
-
 //  Disable cursor interactions at the start
-cursor.setAttribute("raycaster", "objects: none");
+cursor.setAttribute("raycaster", "objects: none"); 
 
 // Play Experience Button Click Event
     // Step 2: Only load video when user clicks "Start Experience"
