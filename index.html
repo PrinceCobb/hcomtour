@@ -156,7 +156,14 @@
     <a-camera><a-cursor raycaster="objects: .clickable" color="yellow"></a-cursor></a-camera>
     <a-entity id="menubtn" position="-0.05 0 0" class="hidden" visible="false">
       <!-- All clickable buttons/entities from your original code -->
-     
+    <a-image src="#ommlab-normal" width="1.5" height="0.39" position="-1.5 1.25 -5" class="clickable" id="ommlab"></a-image>
+      <a-image src="#anatomy-normal" width="1.5" height="0.39" position="-1.5 0.75 -5" class="clickable" id="anatomy"></a-image>
+      <a-image src="#clinical-normal" width="1.5" height="0.39" position="-1.5 0.25 -5" class="clickable" id="clinical"></a-image>
+      <a-image src="#translation-normal" width="1.5" height="0.39" position="-1.5 -0.25 -5" class="clickable" id="translation"></a-image>
+      <a-image src="#cafe-normal" width="1.5" height="0.39" position="1.5 1.25 -5" class="clickable" id="cafe"></a-image>
+      <a-image src="#study-normal" width="1.5" height="0.39" position="1.5 0.75 -5" class="clickable" id="study"></a-image>
+      <a-image src="#fitness-normal" width="1.5" height="0.39" position="1.5 0.25 -5" class="clickable" id="fitness"></a-image>
+      <a-image src="#admin-normal" width="1.5" height="0.39" position="1.5 -0.25 -5" class="clickable" id="admin"></a-image>
     </a-entity>
     <a-entity id="home" position="0.202 0.524 -5" class="hidden" visible="false">
       <a-image src="#homebtn" width="1.5" height="0.39" position="-0.234 0 0.01" class="clickable" id="homebtn"></a-image>
@@ -198,6 +205,71 @@ playPauseButton.style.display = "none";
 videoControls.style.display = "none";
 
    let lastPlayedVideo = null; // Track the last played video
+
+    // Play Experience Button Click Event
+    // Step 2: Only load video when user clicks "Start Experience"
+    playButton.addEventListener("click", () => {
+      playButton.style.display = "none"; // Hide Start Experience button
+      scene.style.visibility = "visible"; // Show A-Frame scene
+      skipButton.style.display = "block"; // Show Skip button
+
+      // Attach video source dynamically only when button is clicked
+      const videoUrl = "https://m2qall8jajdg-hls-push.5centscdn.com/mp4/comp/intro-test.mp4";
+
+      introVideo.src = videoUrl;
+      introVideo.muted = false; // Ensure sound is ON
+      introVideo.currentTime = 0; // Start from beginning
+      introVideo.pause(); // Ensure video is paused until explicitly played
+      console.log("Intro video loaded but still paused.");
+
+      // Set video to A-Frame videosphere
+      const videoSphere = document.getElementById("video-sky");
+      videoSphere.setAttribute("src", "#intro-video"); 
+
+
+      // Explicitly start video
+      introVideo.play().then(() => {
+        console.log("Intro video started with sound.");
+      }).catch((error) => {
+        console.error("Playback Error:", error);
+      });
+    });
+
+    document.addEventListener("DOMContentLoaded", () => {
+  const playButton = document.getElementById("play-button");
+  const skipButton = document.getElementById("skip-button");
+
+  // Initially hide Skip Intro button
+  skipButton.style.display = "none";
+
+  // Show Skip Intro button only when Start Experience is clicked
+  playButton.addEventListener("click", () => {
+    playButton.style.display = "none"; // Hide Start Experience button
+    skipButton.style.display = "block"; // Show Skip Intro button
+  });
+ 
+  // Skip Intro functionality
+  skipButton.addEventListener("click", () => {
+    const introVideo = document.getElementById("intro-video");
+
+    if (introVideo.readyState >= 3) {
+      introVideo.currentTime = introVideo.duration - 2;
+      introVideo.play();
+      console.log("Intro skipped.");
+    } else {
+      console.error("Intro video is not ready.");
+    }
+
+   // Hide Skip Intro button immediately after skipping
+    skipButton.style.display = "none";
+  });
+
+  // **Ensure Skip Button Disappears When Intro Video Ends**
+  introVideo.addEventListener("ended", () => {
+    skipButton.style.display = "none"; // Hide Skip button on video end
+    console.log("Intro video ended, hiding Skip button.");
+  });
+});
 
 // Function to get the currently playing video
 function getCurrentPlayingVideo() {
@@ -344,71 +416,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
 //  Disable cursor interactions at the start
 cursor.setAttribute("raycaster", "objects: none");
-
-// Play Experience Button Click Event
-    // Step 2: Only load video when user clicks "Start Experience"
-    playButton.addEventListener("click", () => {
-      playButton.style.display = "none"; // Hide Start Experience button
-      scene.style.visibility = "visible"; // Show A-Frame scene
-      skipButton.style.display = "block"; // Show Skip button
-
-      // Attach video source dynamically only when button is clicked
-      const videoUrl = "https://m2qall8jajdg-hls-push.5centscdn.com/mp4/comp/intro-test.mp4";
-
-      introVideo.src = videoUrl;
-      introVideo.muted = false; // Ensure sound is ON
-      introVideo.currentTime = 0; // Start from beginning
-      introVideo.pause(); // Ensure video is paused until explicitly played
-      console.log("Intro video loaded but still paused.");
-
-      // Set video to A-Frame videosphere
-      const videoSphere = document.getElementById("video-sky");
-      videoSphere.setAttribute("src", "#intro-video"); 
-
-
-      // Explicitly start video
-      introVideo.play().then(() => {
-        console.log("Intro video started with sound.");
-      }).catch((error) => {
-        console.error("Playback Error:", error);
-      });
-    });
-
-    document.addEventListener("DOMContentLoaded", () => {
-  const playButton = document.getElementById("play-button");
-  const skipButton = document.getElementById("skip-button");
-
-  // Initially hide Skip Intro button
-  skipButton.style.display = "none";
-
-  // Show Skip Intro button only when Start Experience is clicked
-  playButton.addEventListener("click", () => {
-    playButton.style.display = "none"; // Hide Start Experience button
-    skipButton.style.display = "block"; // Show Skip Intro button
-  });
- 
-  // Skip Intro functionality
-  skipButton.addEventListener("click", () => {
-    const introVideo = document.getElementById("intro-video");
-
-    if (introVideo.readyState >= 3) {
-      introVideo.currentTime = introVideo.duration - 2;
-      introVideo.play();
-      console.log("Intro skipped.");
-    } else {
-      console.error("Intro video is not ready.");
-    }
-
-   // Hide Skip Intro button immediately after skipping
-    skipButton.style.display = "none";
-  });
-
-  // **Ensure Skip Button Disappears When Intro Video Ends**
-  introVideo.addEventListener("ended", () => {
-    skipButton.style.display = "none"; // Hide Skip button on video end
-    console.log("Intro video ended, hiding Skip button.");
-  });
-});
    
 //  Store last timestamp for `intro-video`
 let introVideoPauseTime = 0;
