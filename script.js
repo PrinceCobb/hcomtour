@@ -74,16 +74,21 @@ const videoUrlsMap = {
  */
 let currentVideo = null;
 const introPlayButton = document.getElementById(playButtonIdsMap[SCENES.INTRO]);
+let currentScene = null;
 
 // Get all video elements
 const videoElements = Object.values(videoIdsMap).map((id) =>
   document.getElementById(id)
 );
 
+function hideVideoControls() {
+  elements.playPauseButton.style.display = "none";
+  elements.videoControls.style.display = "none";
+  elements.skipButton.style.display = "none";
+}
+
 // Initialize controls
-elements.playPauseButton.style.display = "none";
-elements.videoControls.style.display = "none";
-elements.skipButton.style.display = "none";
+hideVideoControls();
 elements.menuOptions.setAttribute("visible", false);
 elements.backToHomeBtn.setAttribute("visible", false);
 elements.cursor.setAttribute("raycaster", "objects: none");
@@ -131,6 +136,8 @@ function skipToEnd() {
 }
 
 function switchVideo(key, videoId) {
+  if (currentScene === key) return;
+  currentScene = key;
   videoElements.forEach((vid) => vid.pause());
 
   elements.videoSphere.setAttribute("src", `#${videoId}`);
@@ -239,6 +246,7 @@ document.addEventListener("DOMContentLoaded", () => {
   elements.backToHomeBtn.addEventListener("click", () => {
     switchVideo(SCENES.INTRO, videoIdsMap[SCENES.INTRO]);
     skipToEnd();
+    hideVideoControls();
     showMenuOptions();
   });
 
