@@ -1,89 +1,112 @@
 #play-button {
-    position: absolute;
-    top: calc(50% - 25px);
-    left: calc(50% - 50px - 45px);
-    width: 180px;
-    height: 70px;
-    z-index: 10;
-    background-color: #006a4b;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    font-size: 18px;
-    font-weight: 500;
-    font-family: 'Barlow', sans-serif;
-    cursor: pointer;
-  }
-  .hidden {
-    display: none;
-    pointer-events: none; /* Disable clicks */
-  }
-  .hidden { display: none; pointer-events: none; }
-  .clickable { pointer-events: auto; }
-  
+  position: absolute;
+  top: calc(50% - 25px);
+  left: calc(50% - 50px - 45px);
+  width: 180px;
+  height: 70px;
+  z-index: 10;
+  background-color: #006a4b;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  font-size: 18px;
+  font-weight: 500;
+  font-family: 'Barlow', sans-serif;
+  cursor: pointer;
+}
+
+.hidden {
+  display: none;
+  pointer-events: none;
+  /* Disable clicks */
+}
+
+.hidden {
+  display: none;
+  pointer-events: none;
+}
+
+.clickable {
+  pointer-events: auto;
+}
+
 /* Fixed Frame for Controls */
 #control-frame {
-position: fixed;
-bottom: 20px;
-left: 50%;
-transform: translateX(-50%);
-width: 360px; /* Ensure it doesn't move around */
-height: 100px;
-display: flex;
-align-items: center;
-justify-content: space-between;
-background: rgba(0, 0, 0, 0.0);
-padding: 10px;
-border-radius: 10px;
-z-index: 999;
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 360px;
+  /* Ensure it doesn't move around */
+  height: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(0, 0, 0, 0.0);
+  padding: 10px;
+  border-radius: 10px;
+  z-index: 999;
 }
 
 /* Play/Pause Button */
 #play-pause-button {
-width: 50px;
-height: 50px;
-background-color: rgba(0, 0, 0, 0.7);
-color: white;
-border: none;
-border-radius: 50%;
-font-size: 24px;
-cursor: pointer;
-display: flex;
-align-items: center;
-justify-content: center;
+  width: 50px;
+  height: 50px;
+  background-color: rgba(0, 0, 0, 0.7);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  font-size: 24px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 /* Skip Intro Button */
 #skip-button {
-display: none; /* Hide initially */
-width: 70px;
-height: 30px;
-cursor: pointer;
+  display: none;
+  /* Hide initially */
+  width: 70px;
+  height: 30px;
+  cursor: pointer;
 }
 
 /* Video Timeline */
 #video-controls {
-flex: 1;
-display: flex;
-align-items: center;
-justify-content: center;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 #video-timeline {
-width: 100%;
-height: 8px;
-background: #ddd;
-border-radius: 5px;
-appearance: none;
-cursor: pointer;
+  width: 100%;
+  height: 8px;
+  background: #ddd;
+  border-radius: 5px;
+  appearance: none;
+  cursor: pointer;
 }
 
 #video-timeline::-webkit-slider-thumb {
-appearance: none;
-width: 14px;
-height: 14px;
-background: #006a4b;
-border-radius: 50%;
-cursor: pointer;
+  appearance: none;
+  width: 14px;
+  height: 14px;
+  background: #006a4b;
+  border-radius: 50%;
+  cursor: pointer;
 }
 
+
+
+/* override AFRAME style */
+.a-dialog-deny-button {
+  background-color: #d3d3d3 !important;
+  color: #7b7979 !important;
+}
+
+.a-dialog-allow-button {
+  background: #1A653C !important;
+  color: white !important;
+}
