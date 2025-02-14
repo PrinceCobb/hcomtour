@@ -92,6 +92,12 @@
   height: 30px;
   cursor: pointer;
 }
+    
+    #menubtn {
+  pointer-events: none; /* Disable interactions when hidden */
+  visibility: hidden;
+  position: 0 -10 0; /* Move it far down */
+}
 
 /* Video Timeline */
 #video-controls {
@@ -154,7 +160,16 @@
     </a-assets>
     <a-videosphere id="video-sky" src="#intro-video" rotation="0 268 0" playsinline></a-videosphere>
     <a-camera><a-cursor raycaster="objects: .clickable" color="yellow"></a-cursor></a-camera>
-    
+    <a-entity id="menubtn" position="-0.05 0 0" class="hidden" visible="false">
+      <a-image src="#ommlab-normal" width="1.5" height="0.39" position="-1.5 1.25 -5" class="clickable" id="ommlab"></a-image>
+      <a-image src="#anatomy-normal" width="1.5" height="0.39" position="-1.5 0.75 -5" class="clickable" id="anatomy"></a-image>
+      <a-image src="#clinical-normal" width="1.5" height="0.39" position="-1.5 0.25 -5" class="clickable" id="clinical"></a-image>
+      <a-image src="#translation-normal" width="1.5" height="0.39" position="-1.5 -0.25 -5" class="clickable" id="translation"></a-image>
+      <a-image src="#cafe-normal" width="1.5" height="0.39" position="1.5 1.25 -5" class="clickable" id="cafe"></a-image>
+      <a-image src="#study-normal" width="1.5" height="0.39" position="1.5 0.75 -5" class="clickable" id="study"></a-image>
+      <a-image src="#fitness-normal" width="1.5" height="0.39" position="1.5 0.25 -5" class="clickable" id="fitness"></a-image>
+      <a-image src="#admin-normal" width="1.5" height="0.39" position="1.5 -0.25 -5" class="clickable" id="admin"></a-image>
+    </a-entity>
     <a-entity id="home" position="0.202 0.524 -5" class="hidden" visible="false">
       <a-image src="#homebtn" width="1.5" height="0.39" position="-0.234 0 0.01" class="clickable" id="homebtn"></a-image>
     </a-entity> 
@@ -391,6 +406,14 @@ document.addEventListener("DOMContentLoaded", () => {
   introVideo.play().catch((e) => console.error("Playback Error:", e));
 });
 
+  
+  function showMenu() {
+  menu.setAttribute("visible", true);
+  menu.classList.remove("hidden");
+  menu.setAttribute("position", "-0.05 0 0"); // Bring it back
+  menu.style.pointerEvents = "auto"; // Enable interaction
+}
+
 
   // 🚀 Show Menu 5 Seconds Before the Intro Video Ends
   introVideo.addEventListener("timeupdate", () => {
@@ -410,7 +433,12 @@ document.addEventListener("DOMContentLoaded", () => {
 //  Disable cursor interactions at the start
 cursor.setAttribute("raycaster", "objects: none");
 
-
+function hideMenu() {
+  menu.setAttribute("visible", false);
+  menu.classList.add("hidden");
+  menu.setAttribute("position", "0 -10 0"); // Move it out of the way
+  menu.style.pointerEvents = "none"; // Disable interaction 
+}
 
 // Handle Video End Logic
 function handleVideoEnd(video) {
