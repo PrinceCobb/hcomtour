@@ -32,7 +32,7 @@
 // }
 
 // document.addEventListener("DOMContentLoaded", () => {
-//   const playButton = document.getElementById("play-button");
+//   const playButton = document.getElementById("intro-play-btn");
 
 //   playButton.addEventListener("click", () => {
 //     requestMotionSensors().then((granted) => {
@@ -52,7 +52,7 @@
 // });
 
 // function initializeTour() {
-//   const playButton = document.getElementById("play-button");
+//   const playButton = document.getElementById("intro-play-btn");
 //   const scene = document.getElementById("scene");
 //   playButton.style.display = "none";
 //   scene.style.visibility = "visible";
