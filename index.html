@@ -30,28 +30,95 @@
   <style>
     body { background-color: white !important; }
     .a-dialog-overlay, .a-dialog, .hidden { display: none !important; pointer-events: none; }
-    #play-button {
-      position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-      width: 180px; height: 70px; z-index: 10;
-      background-color: #006a4b; color: white; border: none; border-radius: 5px;
-      font-size: 18px; font-weight: 500; font-family: 'Barlow', sans-serif; cursor: pointer;
+      #play-button {
+      position: absolute;
+      top: calc(50% - 25px);
+      left: calc(50% - 50px - 45px);
+      width: 180px;
+      height: 70px;
+      z-index: 10;
+      background-color: #006a4b;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      font-size: 18px;
+      font-weight: 500;
+      font-family: 'Barlow', sans-serif;
+      cursor: pointer;
     }
-    #control-frame {
-      position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
-      width: 360px; height: 100px; display: flex; align-items: center; justify-content: space-between;
-      background: rgba(0, 0, 0, 0.0); padding: 10px; border-radius: 10px; z-index: 999;
+    .hidden {
+      display: none;
+      pointer-events: none; /* Disable clicks */
     }
-    #play-pause-button, #skip-button { cursor: pointer; }
-    #play-pause-button {
-      width: 50px; height: 50px; background-color: rgba(0, 0, 0, 0.7); color: white;
-      border: none; border-radius: 50%; font-size: 24px; display: flex; align-items: center; justify-content: center;
-    }
-    #video-timeline {
-      width: 100%; height: 8px; background: #ddd; border-radius: 5px; cursor: pointer;
-    }
-    #video-timeline::-webkit-slider-thumb {
-      appearance: none; width: 14px; height: 14px; background: #006a4b; border-radius: 50%; cursor: pointer;
-    }
+    .hidden { display: none; pointer-events: none; }
+    .clickable { pointer-events: auto; }
+    
+  /* Fixed Frame for Controls */
+#control-frame {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 360px; /* Ensure it doesn't move around */
+  height: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(0, 0, 0, 0.0);
+  padding: 10px;
+  border-radius: 10px;
+  z-index: 999;
+}
+
+/* Play/Pause Button */
+#play-pause-button {
+  width: 50px;
+  height: 50px;
+  background-color: rgba(0, 0, 0, 0.7);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  font-size: 24px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Skip Intro Button */
+#skip-button {
+  display: none; /* Hide initially */
+  width: 70px;
+  height: 30px;
+  cursor: pointer;
+}
+
+/* Video Timeline */
+#video-controls {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#video-timeline {
+  width: 100%;
+  height: 8px;
+  background: #ddd;
+  border-radius: 5px;
+  appearance: none;
+  cursor: pointer;
+}
+
+#video-timeline::-webkit-slider-thumb {
+  appearance: none;
+  width: 14px;
+  height: 14px;
+  background: #006a4b;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
   </style>
 </head>
 <body>
@@ -528,7 +595,7 @@ document.querySelectorAll(".clickable").forEach((button) => {
       introVideo.play();
     });
 
-    // Step 4: Debugging - Catch errors
+    // Step 4: Debugging - Catch errors 
     introVideo.addEventListener("error", (e) => {
       console.error("Video error:", e);
     });
