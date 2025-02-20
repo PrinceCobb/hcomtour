@@ -51,7 +51,7 @@ const videoIdsMap = {
 
 const videoUrlsMap = {
   [SCENES.INTRO]:
-    "https://m2qall8jajdg-hls-push.5centscdn.com/mp4/comp/intro-test.mp4",
+    "https://m2qall8jajdg-hls-push.5centscdn.com/mp4/HCOMVideos/intro_fn.mp4",
   [SCENES.OMM_LAB]:
     "https://m2qall8jajdg-hls-push.5centscdn.com/mp4/comp/OMM.mp4",
   [SCENES.ANATOMY_LAB]:
