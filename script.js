@@ -58,7 +58,7 @@ const videoUrlsMap = {
     "https://m2qall8jajdg-hls-push.5centscdn.com/mp4/comp/Anatomy.mp4",
   [SCENES.CLINICAL_LAB]:
     "https://m2qall8jajdg-hls-push.5centscdn.com/mp4/comp/CTAC.mp4",
-  [SCENES.TRANSLATION_LAB]: "https://m2qall8jajdg-hls-push.5centscdn.com/mp4/comp/CTAC.mp4",
+  [SCENES.TRANSLATION_LAB]: "https://m2qall8jajdg-hls-push.5centscdn.com/test/Credits.mp4",
   [SCENES.CAFE]:
     "https://m2qall8jajdg-hls-push.5centscdn.com/mp4/comp/Student.mp4",
   [SCENES.STUDY]:
