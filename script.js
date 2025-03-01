@@ -66,7 +66,7 @@ const videoUrlsMap = {
   [SCENES.FITNESS]:
     "https://m2qall8jajdg-hls-push.5centscdn.com/mp4/HCOMVideos/Fitness_fn.mp4",
   [SCENES.ADMIN]:
-    "https://m2qall8jajdg-hls-push.5centscdn.com/mp4/HCOMVideos/AdmissionNew_fn.mp4",
+    "https://m2qall8jajdg-hls-push.5centscdn.com/mp4/HCOMVideos/Admissionnew_fn.mp4",
 };
 
 /**
@@ -118,6 +118,11 @@ function togglePlayPause() {
   } else {
     currentVideo.pause();
     elements.playPauseButton.textContent = "▶";
+
+    // Remove any existing event listeners that may be resuming playback
+    currentVideo.onended = null;
+    currentVideo.onpause = null;
+    clearTimeout(resumeTimeout); // If any timeout is set elsewhere
   }
 }
 
