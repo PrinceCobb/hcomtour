@@ -75,8 +75,8 @@
 #homebtn {
   width: auto; 
   height: auto; 
-  box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.5); 
-  border-radius: 5px; /* Optional: Smooth edges */
+  box-shadow: 7px 7px 40px rgba(0, 0, 0, 0.5); 
+  border-radius: 35px; /* Optional: Smooth edges */
 }
 
 /* Video Timeline */
