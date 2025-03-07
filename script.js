@@ -109,8 +109,7 @@ function togglePlayPause() {
 
   if (currentVideo.paused) {
     currentVideo.muted = false;
-    currentVideo
-      .play()
+    currentVideo.play()
       .then(() => {
         elements.playPauseButton.textContent = "II";
       })
@@ -119,10 +118,12 @@ function togglePlayPause() {
     currentVideo.pause();
     elements.playPauseButton.textContent = "▶";
 
-    // Remove any existing event listeners that may be resuming playback
-    currentVideo.onended = null;
+    // Ensure no unintended event triggers playback
     currentVideo.onpause = null;
-    clearTimeout(resumeTimeout); // If any timeout is set elsewhere
+    currentVideo.onended = null;
+
+    // Explicitly prevent auto-resume by removing stalled auto-playback
+    currentVideo.dataset.manualPause = "true"; // Flag manual pause
   }
 }
 
@@ -172,6 +173,7 @@ function switchVideo(key, videoId) {
 // Event Listeners Setup
 function setupVideoListeners(video) {
   video.addEventListener("play", () => {
+    currentVideo.dataset.manualPause = "false"; // Reset pause flag
     lastPlayedVideo = video;
     elements.playPauseButton.style.display = "flex";
     elements.playPauseButton.textContent = "II";
@@ -209,9 +211,14 @@ function setupVideoListeners(video) {
     console.warn(`Buffering: ${video.id}`)
   );
   video.addEventListener("stalled", () => {
-    console.warn(`Stalled: ${video.id}`);
+  console.warn(`Stalled: ${video.id}`);
+
+  // Resume only if video was NOT manually paused
+  if (!video.paused && currentVideo.dataset.manualPause !== "true") {
     video.play().catch((e) => console.error("Playback Error:", e));
-  });
+  }
+});
+
   video.addEventListener("error", (e) =>
     console.error(`Error: ${video.id}`, e)
   );
