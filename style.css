@@ -75,7 +75,7 @@
 #homebtn {
   width: auto; 
   height: auto; 
-  box-shadow: 7px 7px 40px rgba(0, 0, 0, 0.5); 
+  filter: drop-shadow(7px 7px 10px rgba(0, 0, 0, 0.7));
   border-radius: 35px; /* Optional: Smooth edges */
 }
 
