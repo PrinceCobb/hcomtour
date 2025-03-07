@@ -72,6 +72,13 @@
   cursor: pointer;
 }
 
+#homebtn {
+  width: auto; 
+  height: auto; 
+  box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.5); 
+  border-radius: 5px; /* Optional: Smooth edges */
+}
+
 /* Video Timeline */
 #video-controls {
   flex: 1;
