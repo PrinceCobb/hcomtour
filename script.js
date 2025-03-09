@@ -129,7 +129,7 @@ function togglePlayPause() {
 
 function skipToAlmostEnd() {
   if (currentVideo && currentVideo.readyState >= 3) {
-    currentVideo.currentTime = currentVideo.duration - 2;
+    currentVideo.currentTime = currentVideo.duration - 5;
     currentVideo.play();
     elements.skipButton.style.display = "none";
   }
