@@ -132,9 +132,11 @@ function skipToAlmostEnd() {
     currentVideo.currentTime = currentVideo.duration - 2;
     currentVideo.play();
     elements.skipButton.style.display = "none";
-    // Show the menu button immediately
-        showMenuOptions();
-  }
+  // Delay showing the menu button by 1.5 seconds
+        setTimeout(() => {
+            showMenuOptions();
+        }, 1500);
+    }
 }
 
 function skipToEnd() {
