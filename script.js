@@ -64,7 +64,7 @@ const videoUrlsMap = {
   [SCENES.STUDY]:
     "https://m2qall8jajdg-hls-push.5centscdn.com/mp4/comp/ClassroomFinal.mp4",
   [SCENES.FITNESS]:
-    "https://m2qall8jajdg-hls-push.5centscdn.com/mp4/comp/FitnessFinal.mp4",
+    "https://m2qall8jajdg-hls-push.5centscdn.com/mp4/comp/FitnessMFinal.mp4",
   [SCENES.ADMIN]:
     "https://m2qall8jajdg-hls-push.5centscdn.com/mp4/comp/AdmissionFinal.mp4",
 };
