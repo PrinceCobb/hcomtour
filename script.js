@@ -51,22 +51,22 @@ const videoIdsMap = {
 
 const videoUrlsMap = {
   [SCENES.INTRO]:
-    "https://m2qall8jajdg-hls-push.5centscdn.com/mp4/HCOMVideos/intro_fn2.mp4",
+    "https://m2qall8jajdg-hls-push.5centscdn.com/mp4/HCOMVideos/intro_finals.mp4",
   [SCENES.OMM_LAB]:
-    "https://m2qall8jajdg-hls-push.5centscdn.com/mp4/comp/OMMFinal.mp4",
+    "https://m2qall8jajdg-hls-push.5centscdn.com/mp4/HCOMVideos/OMMFinals.mp4",
   [SCENES.ANATOMY_LAB]:
-    "https://m2qall8jajdg-hls-push.5centscdn.com/mp4/comp/AnatomyFinal.mp4",
+    "https://m2qall8jajdg-hls-push.5centscdn.com/mp4/HCOMVideos/AnatomyFinals.mp4",
   [SCENES.CLINICAL_LAB]:
-    "https://m2qall8jajdg-hls-push.5centscdn.com/mp4/comp/CTACFinal.mp4",
+    "https://m2qall8jajdg-hls-push.5centscdn.com/mp4/HCOMVideos/CTACFinals.mp4",
   [SCENES.TRANSLATION_LAB]: "http://m2qall8jajdg-hls-push.5centscdn.com/mp4/HCOMVideos/Credits_fn3.mp4",
   [SCENES.CAFE]:
-    "https://m2qall8jajdg-hls-push.5centscdn.com/mp4/comp/StudentCafeFinals.mp4",
+    "https://m2qall8jajdg-hls-push.5centscdn.com/mp4/HCOMVideos/StudentCafeFinals.mp4",
   [SCENES.STUDY]:
-    "https://m2qall8jajdg-hls-push.5centscdn.com/mp4/comp/ClassroomFinal.mp4",
+    "https://m2qall8jajdg-hls-push.5centscdn.com/mp4/HCOMVideos/ClassroomFinals.mp4",
   [SCENES.FITNESS]:
-    "https://m2qall8jajdg-hls-push.5centscdn.com/mp4/comp/FitnessMFinal.mp4",
+    "https://m2qall8jajdg-hls-push.5centscdn.com/mp4/HCOMVideos/FitnessMFinals.mp4",
   [SCENES.ADMIN]:
-    "https://m2qall8jajdg-hls-push.5centscdn.com/mp4/comp/AdmissionFinal.mp4",
+    "https://m2qall8jajdg-hls-push.5centscdn.com/mp4/HCOMVideos/AdmissionFinals.mp4",
 };
 
 /**
