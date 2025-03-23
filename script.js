@@ -60,7 +60,7 @@ const videoUrlsMap = {
     "https://m2qall8jajdg-hls-push.5centscdn.com/mp4/comp/CTACFinal.mp4",
   [SCENES.TRANSLATION_LAB]: "http://m2qall8jajdg-hls-push.5centscdn.com/mp4/HCOMVideos/Credits_fn3.mp4",
   [SCENES.CAFE]:
-    "https://8v4o66k9owqp-hls-push.5centscdn.com/mp4/StudentCafeFinal.mp4",
+    "https://m2qall8jajdg-hls-push.5centscdn.com/mp4/comp/StudentCafeFinals.mp4",
   [SCENES.STUDY]:
     "https://m2qall8jajdg-hls-push.5centscdn.com/mp4/comp/ClassroomFinal.mp4",
   [SCENES.FITNESS]:
